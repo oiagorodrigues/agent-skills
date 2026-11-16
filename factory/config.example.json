@@ -1,0 +1,126 @@
+{
+  "profiles": {
+    "example-work": {
+      "claude_config_dir": "~/.claude-example-work",
+      "git_email": "you@example.com",
+      "delivery_rules": "~/.agents/skills/example-workspace/references/delivery.md",
+      "ship": "draft",
+      "ship_max": "prod",
+      "gates": [
+        "push",
+        "merge",
+        "apply",
+        "prod"
+      ],
+      "locked_gates": [
+        "merge",
+        "apply",
+        "prod"
+      ],
+      "preflight": [
+        "slack:EXAMPLE-DEPLOYS-CHANNEL-ID",
+        "slack:EXAMPLE-INCIDENTS-CHANNEL-ID"
+      ],
+      "watch": {
+        "minutes": 60,
+        "checks_at": [
+          10,
+          30,
+          60
+        ],
+        "sources": [
+          "sentry",
+          "datadog",
+          "slack:EXAMPLE-INCIDENTS-CHANNEL-ID",
+          "slack:EXAMPLE-ALERTS-CHANNEL-ID",
+          "slack:EXAMPLE-BUG-REPORTS-CHANNEL-ID"
+        ],
+        "page_on": [
+          "slack:EXAMPLE-INCIDENTS-CHANNEL-ID"
+        ]
+      }
+    },
+    "personal": {
+      "ship": "draft",
+      "ship_max": "merge",
+      "gates": []
+    }
+  },
+  "repos": {
+    "example-api": {
+      "profile": "example-work",
+      "land": "queue",
+      "prod": "gh workflow run example-promote.yml -R example-org/example-api",
+      "preflight": [
+        "slack:EXAMPLE-API-DEPLOYS-CHANNEL-ID"
+      ],
+      "watch_sources": [
+        "slack:EXAMPLE-API-ALERTS-CHANNEL-ID"
+      ]
+    },
+    "example-web": {
+      "profile": "example-work",
+      "land": "queue",
+      "staging_acceptance": "gh workflow run example-e2e.yml -R example-org/example-web -f environment=staging",
+      "prod": "gh workflow run example-promote.yml -R example-org/example-web",
+      "preflight": [
+        "slack:EXAMPLE-WEB-DEPLOYS-CHANNEL-ID"
+      ],
+      "watch_sources": [
+        "slack:EXAMPLE-WEB-ALERTS-CHANNEL-ID"
+      ]
+    },
+    "example-lambdas": {
+      "profile": "example-work",
+      "land": "merge",
+      "deploy": {
+        "order": [
+          "migrations",
+          "lambdas",
+          "infra"
+        ],
+        "steps": {
+          "migrations": {
+            "when_changed": [
+              "models/migrations/**"
+            ],
+            "run": "gh workflow run example-migrations.yml -R example-org/example-lambdas --ref main -f environment={env}"
+          },
+          "lambdas": {
+            "when_changed": [
+              "functions/**",
+              "pyproject.toml"
+            ],
+            "run": "gh workflow run example-build-lambdas.yml -R example-org/example-lambdas --ref main -f deploy_env={env}"
+          },
+          "infra": {
+            "when_changed": [
+              "terraform/**"
+            ],
+            "run": "terraform PR bumping the module ref to the release tag, landed with Atlantis",
+            "before": "lambdas when the change adds a Lambda"
+          }
+        },
+        "envs": [
+          "staging",
+          "prod"
+        ]
+      },
+      "preflight": [
+        "slack:EXAMPLE-LAMBDAS-DEPLOYS-CHANNEL-ID"
+      ],
+      "watch_sources": [
+        "slack:EXAMPLE-LAMBDAS-ALERTS-CHANNEL-ID",
+        "sentry:example-org/example-lambdas"
+      ]
+    },
+    "example-terraform": {
+      "profile": "example-work",
+      "land": "atlantis"
+    },
+    "example-personal-project": {
+      "profile": "personal",
+      "ship": "ready"
+    }
+  }
+}
