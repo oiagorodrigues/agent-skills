@@ -160,7 +160,7 @@ After adding, renaming or removing a skill, run `~/.agents/bin/link-skills.sh`. 
 
 ### Writing
 
-- `plain-writing`: checklist of AI-writing tells; reads a private `my-voice` skill for the author's voice when one exists.
+- `plain-writing`: checklist of AI-writing tells, plus the author's own voice.
 - `reply-with-standing`: drafts and checks messages sent to people on the user's behalf.
 - `business-first-pitch`: turns a technical idea into a business case with ROI.
 - `explain`: re-explains the last message in plain words.

@@ -174,7 +174,7 @@ Flag and fix any of these before handing it back:
 - Claims about numbers, dates, scope or what a tool checks that you haven't verified. List these for the user to check.
 - An argument that rests on what the code supports, or on a single event, without the usage number behind it (active customers, orders, occurrences in the last 12 months). Run step 2 or drop the argument.
 - Agreement or a defense with no evidence behind it: conceding because the other person is senior or confident, or holding the user's or the agent's own design because it follows an existing pattern. Run "Technical proposals and design pushback" first.
-- Plain-writing issues, and a reply that doesn't sound like the author. Load the `plain-writing` skill and the author's voice (`my-voice` skill, when present).
+- Plain-writing issues, and a reply that doesn't sound like the author. Load the `plain-writing` skill, including its author's voice section.
 
 If the user's draft is already good, say so and change only what makes it weaker. Don't rewrite for the sake of it.
 
