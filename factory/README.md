@@ -6,10 +6,15 @@ Takes a Jira ticket to a draft PR with one headless agent run per stage (discove
 
 - `hooks/guard-bash.sh`: PreToolUse hook (matcher `Bash`) in every stage's settings. Blocks push, merge, rebase, `reset --hard`, `clean`, switching to the trunk, GitHub writes, TLS-off flags, `curl | sh`, credentials piped to the network and publishing.
 - `lib/checks.sh`: runs a repo's check commands once per commit and caches PASS/FAIL by SHA.
-- `lib/review-bundle.sh`: diff, commits, files changed outside the plan, callers of changed exports and tests touched, in one file for verify and pr.
-- `lib/secret-scan.sh`: scans the lines a branch adds for secrets before the factory pushes.
-- `checks/`: `_all.md` and one `<repo>.md` per repo, one pass/fail line per mistake caught; verify runs them, implement never sees them.
-- `templates/plan.md`: plan-stage output. Its "Files to change" feeds the out-of-plan check.
+- `checks/<repo>.md` (optional): checks for one repo that aren't company specific. Company repos keep theirs in the workspace skill (`references/checks/<repo>.md`).
+
+The general pieces live in global skills, so any agent uses them without the factory, and the stages read them from there:
+
+- Plan-stage output: `engineering-practices` `references/plan-template.md`. Its "Files to change" feeds the out-of-plan check.
+- Checks for every repo: `engineering-practices` `references/done-checks.md`; verify runs them, implement never sees them.
+- Review bundle (diff, commits, files outside the plan, callers of changed exports, touched tests): `review-pr` `scripts/review-bundle.sh`.
+- Secret scan before a push: gitleaks (`security-review`, `references/sinks-and-secrets.md`), or `security-review` `scripts/secret-scan.sh` without it.
+- Verification rules: `engineering-practices` `references/reducing-ai-slop.md`. Landing, the prod watch and the cleanup: `engineering-practices` `references/delivery-rules.md`, section 5, with the company's values in the workspace skill.
 
 ## Orchestrator rules
 
@@ -24,8 +29,8 @@ Takes a Jira ticket to a draft PR with one headless agent run per stage (discove
 - Verification follows `engineering-practices` (`references/reducing-ai-slop.md`), which the plan, plan-check, qa and verify stages read:
   - plan writes every AC as a pass/fail line with its check method; plan-check (read-only, cheap model) sends back a plan with a vague AC, an AC with no check, or steps outside the scope.
   - qa writes the failing tests or scenarios for each AC before implement and shows they fail on the base. The script lists them in `runs/<ticket>/locked-files`, and a PreToolUse hook on Edit, Write and Bash refuses changes to them during implement.
-  - verify runs on a clean checkout of the SHA with no Edit or Write tools and never gets the implement transcript. It runs the result (app plus `agent-browser`, real API calls, `verify-etl`), defaults to fail, attaches proof per line to `runs/<ticket>/evidence/`, and also runs every line of `checks/_all.md` and `checks/<repo>.md`. At most 3 implement and verify rounds before the ladder below.
-  - A mistake the user or a reviewer catches after "done" becomes a proposed line in `checks/<repo>.md`, added after the user's yes.
+  - verify runs on a clean checkout of the SHA with no Edit or Write tools and never gets the implement transcript. It runs the result (app plus `agent-browser`, real API calls, `verify-etl`), defaults to fail, attaches proof per line to `runs/<ticket>/evidence/`, and also runs every line of `done-checks.md` and the repo's checks file. At most 3 implement and verify rounds before the ladder below.
+  - A mistake the user or a reviewer catches after "done" becomes a proposed line in the repo's checks file (or `done-checks.md` when it holds for every repo), added after the user's yes.
 - The verify verdict comes from a different model than the one that implemented, in a fresh context with only the diff, the plan and the checks. Prefer another vendor (Codex against Claude). The profile's model allowlist decides what is allowed; when it allows one vendor only, verify uses a different model of that vendor.
 
 ## Shipping
