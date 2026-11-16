@@ -1,0 +1,16 @@
+# Findings confirmed as false positives, kept by path and pattern so they survive a history rewrite
+# (a .gitleaksignore fingerprint includes the commit SHA).
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Vendored third-party docs with placeholder tokens (YOUR_ACCESS_TOKEN, generated_32_byte_hex) and code identifiers"
+paths = [
+  '''^skills/auth0/references/''',
+  '''^skills/modern-web-guidance/vendor/''',
+]
+
+[[allowlists]]
+description = "AWS's public package-signing key fingerprint"
+regexTarget = "line"
+regexes = ['''SIGNING_KEY_FPR="[0-9A-F]{40}"''']

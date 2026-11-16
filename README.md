@@ -197,7 +197,7 @@ After adding, renaming or removing a skill, run `~/.agents/bin/link-skills.sh`. 
 
 ## Before pushing this repo
 
-Run `gitleaks git ~/.agents --no-banner --redact` and check that it reports no leaks. A finding confirmed as a false positive (a placeholder in vendored docs, a public key fingerprint) goes in `.gitleaksignore` by its fingerprint. `review-skills` (`check_skill.py --sensitive`) catches the values gitleaks doesn't look for: account IDs, emails, channel IDs and internal hostnames.
+Run `gitleaks git ~/.agents --no-banner --redact` and check that it reports no leaks. A finding confirmed as a false positive (a placeholder in vendored docs, a public key fingerprint) goes in the allowlist in `.gitleaks.toml`, by path or pattern, because a `.gitleaksignore` fingerprint includes the commit SHA and stops matching after a history rewrite. `review-skills` (`check_skill.py --sensitive`) catches the values gitleaks doesn't look for: account IDs, emails, channel IDs and internal hostnames.
 
 ## Tools to install
 
