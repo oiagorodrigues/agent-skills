@@ -1,0 +1,3 @@
+scripts/scan_skill.py is copied unchanged from Sentry's skill-scanner skill,
+https://github.com/getsentry/skills, licensed under the Apache License 2.0.
+Its license text is in scripts/LICENSE-scan_skill.
