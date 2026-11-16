@@ -89,6 +89,7 @@ When a coding task is done and the change is headed for a PR, decide with `revie
 
 - When fixing a bug or building something, don't create a summary file unless you are in plan mode or the user asks for one.
 - Never stop a process, container or dev server you didn't start (for example the user's dev server) without asking first.
+- Merging a PR is the user's call. Merge or enqueue a PR only when the user asks you to land that PR, even when it is approved and green; otherwise say it is ready to merge.
 
 ## Human to-do list
 
