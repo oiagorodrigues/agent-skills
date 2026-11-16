@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{theme}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <style>
+    :root { --bg: #f6f8fa; --panel: #ffffff; --ink: #1f2328; --muted: #59636e; --line: #d0d7de; }
+    [data-theme="dark"] { --bg: #010409; --panel: #0d1117; --ink: #e6edf3; --muted: #9198a1; --line: #3d444d; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--ink); padding: 24px 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    main { max-width: 1400px; margin: 0 auto; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    h1 { font-size: 22px; font-weight: 700; }
+    .toolbar { display: flex; gap: 8px; }
+    .toolbar button { font: inherit; font-size: 13px; color: var(--ink); background: var(--panel);
+      border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+    .diagram { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
+    .diagram svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 16px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+    .card h2 { font-size: 15px; margin-bottom: 8px; }
+    .card ul { padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    @media print { body { background: #fff; padding: 0; } .toolbar { display: none; }
+      .diagram { border: 0; overflow: visible; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>{{title}}</h1>
+    <div class="toolbar">
+      <button type="button" onclick="saveSvg()">SVG</button>
+      <button type="button" onclick="savePng()">PNG</button>
+      <button type="button" onclick="window.print()">PDF</button>
+    </div>
+  </header>
+  <div class="diagram" id="diagram">
+{{svg}}  </div>
+  {{cards}}
+</main>
+<script>
+  function svgText() {
+    return new XMLSerializer().serializeToString(document.querySelector('#diagram svg'));
+  }
+  function save(url, name) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+  }
+  function saveSvg() {
+    save(URL.createObjectURL(new Blob([svgText()], { type: 'image/svg+xml' })), 'diagram.svg');
+  }
+  function savePng() {
+    const svg = document.querySelector('#diagram svg');
+    const scale = 2;
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = svg.width.baseVal.value * scale;
+      canvas.height = svg.height.baseVal.value * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      save(canvas.toDataURL('image/png'), 'diagram.png');
+    };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText());
+  }
+</script>
+</body>
+</html>

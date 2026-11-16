@@ -1,0 +1,34 @@
+{
+  "title": "Checkout on AWS",
+  "nodes": [
+    {"id": "buyers", "label": "Buyers", "kind": "people", "icon": "users", "row": 0, "col": 1, "public": true},
+    {"id": "cdn", "label": "Cloudflare", "kind": "networking", "icon": "cloudflare", "row": 1, "col": 1, "public": true},
+    {"id": "auth0", "label": "Auth0", "kind": "security", "icon": "auth0", "row": 1, "col": 3, "public": true},
+    {"id": "alb", "label": "Load balancer", "kind": "networking", "icon": "aws-elb", "row": 2, "col": 1},
+    {"id": "api", "label": "Checkout API", "kind": "compute", "icon": "aws-ecs", "row": 3, "col": 1},
+    {"id": "sqs", "label": "Order queue", "kind": "queue", "icon": "aws-sqs", "row": 3, "col": 3},
+    {"id": "db", "label": "Orders DB", "kind": "database", "icon": "aws-rds", "row": 4, "col": 0},
+    {"id": "cache", "label": "Session cache", "kind": "database", "icon": "aws-elasticache", "row": 4, "col": 1},
+    {"id": "worker", "label": "Payment worker", "kind": "compute", "icon": "aws-ecs", "row": 5, "col": 2},
+    {"id": "stripe", "label": "Stripe", "kind": "vendor", "icon": "stripe", "row": 6, "col": 2, "public": true}
+  ],
+  "groups": [
+    {"id": "vpc", "label": "VPC", "kind": "networking", "contains": ["alb", "api", "db", "cache", "worker"]},
+    {"id": "aws", "label": "AWS account", "kind": "reference", "icon": "aws", "contains": ["vpc", "sqs"]}
+  ],
+  "edges": [
+    {"from": "buyers", "to": "cdn", "label": "https", "public": true},
+    {"from": "buyers", "to": "auth0", "label": "OIDC", "public": true},
+    {"from": "cdn", "to": "alb", "label": "https", "public": true},
+    {"from": "alb", "to": "api", "label": "http"},
+    {"from": "api", "to": "sqs", "label": "IAM role"},
+    {"from": "api", "to": "db", "label": "app_user"},
+    {"from": "api", "to": "cache", "label": "TLS"},
+    {"from": "worker", "to": "sqs", "label": "IAM role"},
+    {"from": "worker", "to": "db", "label": "worker_user"},
+    {"from": "worker", "to": "stripe", "label": "API key", "public": true}
+  ],
+  "cards": [
+    {"title": "Why a queue", "items": ["Stripe calls leave the request path", "Retries happen in the worker"]}
+  ]
+}
