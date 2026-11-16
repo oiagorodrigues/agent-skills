@@ -1,0 +1,20 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          { "type": "command", "command": "$HOME/.agents/skills/product-onboarding/assets/hooks/guard-write.sh" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "$HOME/.agents/skills/product-onboarding/assets/hooks/validate-requirements.sh" }
+        ]
+      }
+    ]
+  }
+}
