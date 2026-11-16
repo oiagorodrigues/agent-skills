@@ -37,15 +37,19 @@ Stryker runs from `pnpm dlx`, so nothing is added to `package.json` or the lockf
 }
 ```
 
-Run it from the repo root, with `<version>` set to the repo's own Vitest version, so the runner uses the same Vitest as the tests:
+Run it from the repo root, with the repo's own Vitest and TypeScript versions from `package.json`, so the runner uses the same ones as the tests:
 
 ```bash
 pnpm --config.dlx-cache-max-age=0 --config.node-linker=hoisted dlx \
-  --package @stryker-mutator/core@10.1.1 --package @stryker-mutator/vitest-runner@10.1.1 --package vitest@<version> \
-  stryker run <scratch>/stryker.config.json --mutate "src/a.ts,src/b.vue" --incremental
+  --package @stryker-mutator/core@10.1.1 --package @stryker-mutator/vitest-runner@10.1.1 \
+  --package vitest@<repo vitest version> --package typescript@<repo typescript version> \
+  stryker run <scratch>/stryker.config.json --mutate "src/a.ts,src/b.vue" \
+  --testFiles "src/a.unit.spec.ts,src/b.spec.ts" --concurrency 2 --incremental
 ```
 
 Keep both Stryker packages pinned to the same version (10.1.1 is the one this command was run with), and keep `--config.node-linker=hoisted` and `--config.dlx-cache-max-age=0`. With pnpm's default layout Stryker finds no runner and stops with `Cannot find TestRunner plugin "vitest". In fact, no TestRunner plugins were loaded.`, and a cached non-hoisted install ignores the linker flag. Stryker doesn't support Vitest browser mode.
+
+In a TypeScript repo, keep `--package typescript@<version>`: Stryker's tsconfig preprocessor imports it and stops with `Cannot find package 'typescript' imported from .../ts-config-preprocessor.js` without it. Always pass `--testFiles` with the specs of the mutated files. Without it the Vitest runner uses `vitest related`, which in a large app whose test setup imports most of the code picks hundreds of test files for a one-line util, and the initial run stops with `Initial test run timed out!` after 5 minutes. `vitest.dir` in the config doesn't narrow it.
 
 Done when every surviving mutant in the changed files is killed by a new assertion or noted as equivalent, and `git status` shows nothing from Stryker.
 
