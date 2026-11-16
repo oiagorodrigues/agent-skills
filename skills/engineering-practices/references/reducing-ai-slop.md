@@ -33,7 +33,7 @@ How to apply it in a pipeline of agent stages:
 - The tests that grade the change come from a step other than the one writing the code, because a wrong idea passes its own tests. That step writes them first and shows they fail on the base. The implementer can't edit them (a hook refuses it); a wrong test goes back to the step that wrote it. The verifier checks they are unchanged and now pass.
 - The verifier is a different model in a fresh context. It gets the criteria, `CHECKS.md`, the commit SHA and the check output, never the maker's transcript, reasoning or summary. It has no edit tools, works on a clean checkout of that SHA, and binds its verdict to it.
 - The verifier tests the result instead of reading the code: it starts the app and drives the changed flow (`agent-browser`), makes the real API calls, recomputes numbers from the source. Reading code only tells it where to look.
-- Keep `CHECKS.md` outside what the maker receives, one file per repo plus one for all repos. In the factory it is `~/.agents/factory/checks/<repo>.md` and `checks/_all.md`.
+- Keep `CHECKS.md` outside what the maker receives, one file per repo plus one for all repos. The one for all repos is `done-checks.md` next to this file; a repo's own file lives in the workspace skill (`references/checks/<repo>.md`).
 
 | Symptom | Missing check |
 |---|---|

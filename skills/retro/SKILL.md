@@ -45,7 +45,7 @@ Prefer the destination that makes the mistake impossible over one that asks the 
 | Destination | When |
 |---|---|
 | Lint rule, type, test, pre-commit or CI check | A mechanical mistake (banned API, import shape, file location, wrong command). |
-| A line in the checks file a verifier runs (factory: `~/.agents/factory/checks/<repo>.md`) | A mistake an agent called done that a person caught, and no tool can check mechanically. |
+| A line in the checks file a verifier runs (`~/.agents/skills/engineering-practices/references/done-checks.md` for all repos, the workspace skill's `references/checks/<repo>.md` for one) | A mistake an agent called done that a person caught, and no tool can check mechanically. |
 | A skill in `~/.agents/skills/<name>/SKILL.md` | The session used that skill and hit a gap, or the skill should have loaded and didn't (then the fix is its `description`). Changes go through `create-skill`. |
 | `~/.agents/AGENTS.md` | A rule for every agent and every repo. Keep it to pointers and hard rules; it loads in every session. |
 | A repo's `CLAUDE.md` or `AGENTS.md` | A fact about that repo only (how to run its tests, where a thing lives). |
