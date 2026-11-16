@@ -125,14 +125,15 @@ The diagram answers one question: what talks to what, over which network.
   `server`, `database`, `cache`, `queue`, `stream`, `bucket`, `cdn`,
   `load-balancer`, `dns`, `gateway`, `lambda`, `container`, `scheduler`, `email`,
   `webhook`, `lock`, `key`, `shield`, `monitoring`, `logs`, `bot`.
-- `aws` (25): AWS service glyphs such as `aws-lambda`, `aws-s3`, `aws-rds`,
+- `aws` (25): AWS service names such as `aws-lambda`, `aws-s3`, `aws-rds`,
   `aws-sqs`, `aws-ecs`, `aws-eks`, `aws-api-gateway`, `aws-dynamodb`,
   `aws-elasticache`, `aws-cognito`, `aws-secrets-manager`, `aws-cloudwatch`,
-  `aws-route53`, `aws-elb`. `aws-cloudfront`, `aws-sns`, `aws-eventbridge` and
-  `aws-step-functions` use generic glyphs.
+  `aws-route53`, `aws-elb`, each drawn with a generic glyph for the service,
+  because AWS logos can't be redistributed.
 - `brands` (51): vendor logos by Simple Icons slug, such as `stripe`, `auth0`,
-  `datadog`, `sentry`, `postgresql`, `redis`, `apachekafka`, `github`, `slack`,
-  `twilio`, `cloudflare`, `openai`.
+  `datadog`, `sentry`, `postgresql`, `redis`, `apachekafka`, `github`,
+  `cloudflare`. `microsoftazure`, `openai`, `salesforce`, `sendgrid`, `slack` and
+  `twilio` use generic glyphs, because Simple Icons no longer carries them.
 
 `icons/SOURCES.md` records where each set comes from and its license. To add an
 icon, add an entry with a 24x24 `body` to the matching JSON file; `style` is
