@@ -1,6 +1,6 @@
 ---
 name: plain-writing
-description: "Checklist of telltale AI-chatbot writing patterns to avoid (puffery vocabulary, \"not just X but Y\" and \"X, not Y\" constructions, canned Challenges/Conclusion sections, inline-bold bullet lists, em-dash overuse, title-case headings, filler like \"let me know\"), adapted from Wikipedia's \"Signs of AI writing\". Use before writing any prose a person will read: chat replies, summaries, PR descriptions, commit messages, Jira and Confluence pages, docs, comments. Points to the author's own voice (the my-voice skill, when present) for anything written for him to send or publish."
+description: "Checklist of telltale AI-chatbot writing patterns to avoid (puffery vocabulary, \"not just X but Y\" and \"X, not Y\" constructions, canned Challenges/Conclusion sections, inline-bold bullet lists, em-dash overuse, title-case headings, filler like \"let me know\"), adapted from Wikipedia's \"Signs of AI writing\". Use before writing any prose a person will read: chat replies, summaries, PR descriptions, commit messages, Jira and Confluence pages, docs, comments. Also holds the author's own voice (traits from real messages, habits to leave out, recurring typos) for anything written in the author's name."
 ---
 
 # Plain writing
@@ -75,7 +75,27 @@ Documents, pages, PRs and messages written for someone else to publish must read
 
 ## The author's voice
 
-If `~/.agents/skills/my-voice/SKILL.md` exists, read it for the author's voice before writing anything in his name.
+When writing in the author's name (Slack, PR descriptions, Jira, docs, emails), write in the voice they are building, not only the one they have today: a senior engineer and technical leader with product and business sense, who brings the plan, owns the work and is easy to understand. The `reply-with-standing` skill covers stance and behavior in messages to people; this section covers how the words sound. The workspace skill, when one exists, may hold real examples from the author's messages there.
+
+Keep from the author's best messages:
+
+- Plain, friendly, direct. Contractions (I'll, it's, won't). Short openers with a name ("Hey <name>.", "Thanks, <name>.", "Got it."). In Slack a light informal word is fine ("btw", "TBH"); in PRs, docs and Jira it isn't.
+- Context before the question: "A PM said each location needs its own tax ID, but in the code one tax ID can belong to several companies. Is that how the product behaves? If so, we couldn't store it per location."
+- Agree first, then build: "You're right. Making the docs private could create unnecessary friction, especially since PMs and other stakeholders reference them."
+- Pushback with the cost and an alternative: "This would block the user until it's closed. We can keep the same behavior as the other flow and show an Alert with the validation error below the field."
+- Status as done, proof, what's next: "Both are done and deployed. I tested them on staging and everything works as expected. I'll watch the alerts for related issues."
+- Answers to customer support and product lead with the answer (confirmed or not, the cause) and add the plan only when there is one, in one message.
+- In Slack and Jira message text, links go on a short label ("this ticket", the ticket title), never a bare URL in the sentence. Chat replies to the user keep raw URLs.
+
+Hard rules, everywhere:
+
+- One complete message per thought. Never split a point, its reason and its question across several messages.
+- No "X covers/answers the why:" or "[Topic]:" lead-ins before the point. Write "Git history says that most are 2019 copies...", never "Git history covers the why: most are 2019 copies...". This applies to the sentence frames suggested in Learning sections too.
+- Messages to other people (Slack, PR comments and replies, Jira and Confluence comments, emails) follow the `reply-with-standing` skill for length, the ask, ownership and tone. PR descriptions follow `create-pr`.
+- No profanity or venting in anything work-related.
+- No typos or grammar slips. The author's recurring ones: "than" for "then", "I advice", "a easy", "I'll not able", "I'll can", "Ill", "23th", "what you think?", "the the". Fix them silently.
+
+Portuguese DMs with close Brazilian colleagues are a different register (lowercase, "kk", slang). Don't formalize those unless the author asks.
 
 ## Concise, clear and compelling
 
