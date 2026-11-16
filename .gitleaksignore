@@ -1,0 +1,19 @@
+# False positives confirmed by hand: placeholders in vendored docs, a public GPG key fingerprint, code identifiers.
+0dfae3f125ed290a1405c5464b31a08c436fd062:skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/guides/security/client-side-encryption.md:generic-api-key:187
+0dfae3f125ed290a1405c5464b31a08c436fd062:skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/guides/security/client-side-encryption.md:generic-api-key:201
+0dfae3f125ed290a1405c5464b31a08c436fd062:skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/search.mjs:generic-api-key:31
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/feature-migration/index.md:curl-auth-header:1304
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/feature-migration/index.md:curl-auth-header:1387
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/feature-migration/index.md:curl-auth-header:1425
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/framework-go/index.md:curl-auth-header:1588
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/framework-laravel-api/index.md:curl-auth-header:351
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/feature-custom-domains/index.md:curl-auth-header:509
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/feature-custom-domains/index.md:curl-auth-header:524
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/feature-custom-domains/index.md:curl-auth-header:532
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/feature-custom-domains/index.md:curl-auth-header:542
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/framework-php-api/index.md:curl-auth-header:397
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/framework-php-api/index.md:curl-auth-header:410
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/framework-php/index.md:generic-api-key:620
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/framework-springboot-api/index.md:curl-auth-header:164
+f6a8096e6082cfb9da799f300d4c3f700b964668:skills/auth0/references/framework-springboot-api/index.md:curl-auth-header:491
+883bdc129ae737259032a6b0582f654ba2f936b8:bin/aws-emulator:generic-api-key:14
