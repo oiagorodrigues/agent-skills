@@ -39,7 +39,7 @@ How far the script takes a ticket after verify passes. Each level includes the o
 | `ready` | After CI passes on the PR head, marks the PR ready for review. |
 | `merge` | Waits for approvals, answers review comments, then lands the PR the way the repo requires (see "Landing"). |
 | `staging` | Waits for the release and the staging deploy, runs the staging acceptance checks and tests the change in the browser, with screenshots when the change is visible. |
-| `prod` | Runs the preflight checks, deploys to prod, then watches it (see "Watching prod"). |
+| `prod` | Runs the preflight checks, deploys to prod, then watches it (see "Watching prod"). When the watch finds no bug or regression from the deploy, runs the cleanup (`engineering-practices` `references/delivery-rules.md`, section 5, with the company's steps in the profile's `delivery_rules` file), which ends with the ticket moved to Done. |
 
 The level is resolved in layers, each one overriding the one before:
 
