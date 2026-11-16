@@ -29,12 +29,13 @@ mutmut runs from uv's cache, layered on the project's environment, so nothing is
 
 - uv project: `uv run --with mutmut mutmut run "<module>*"`. It leaves `pyproject.toml` and `uv.lock` untouched.
 - Poetry or plain-venv project: `uv run --no-project --python "$(poetry env info -p)/bin/python" --with mutmut mutmut run "<module>*"`, or `--python .venv/bin/python` for a plain venv. Plain `uv run --with` in such a repo writes a `uv.lock` into it.
+- Tests that run in a Docker image without uv: run `pip download -q -d /wheels mutmut` once in a `--rm` container with a scratch folder mounted at `/wheels`. Then run mutmut in a `--rm --network none` container with the worktree mounted, which installs it with `pip install -q --no-index --find-links /wheels mutmut` and runs `mutmut run`. The image, the lockfile and the shared database stay untouched. Pass an env file by sourcing it inside the container (`set -a; . /env/x.env; set +a`), because `docker run --env-file` keeps the quotes that compose strips. The workspace skill, when one exists, has the image and settings.
 - `uvx mutmut run` fails with `ModuleNotFoundError` as soon as a test imports a project dependency, because it runs in mutmut's own environment.
 
 Then:
 
 1. Limit the run to the changed modules with a quoted glob on the mutant name, which is `<dotted module>.x_<function>__mutmut_<n>`: `"billing.price*"`.
-2. If mutmut stops with "Could not figure out where the code to mutate is", add `source_paths = ["<package dir>"]` under `[tool.mutmut]` in `pyproject.toml` for the run, and restore the file before committing.
+2. Keep the `[tool.mutmut]` config out of the repo: copy `pyproject.toml` to the scratchpad, append the block, and mount the copy read-only over the repo's file in a container (`-v <scratch>/pyproject.mutmut.toml:<app dir>/pyproject.toml:ro`), or restore the file before committing when running on the host. Set `only_mutate` to the changed files and `pytest_add_cli_args_test_selection` to their test files; without it the stats run collects the whole suite. Add `source_paths = ["<package dir>"]` if mutmut stops with "Could not figure out where the code to mutate is". In Django, also set `also_copy = ["conftest.py", "manage.py", "<apps dir>/"]`, because mutmut copies only the source dir, `tests/` and lockfiles into `mutants/`; without `manage.py` the tests import the unmutated code and mutmut stops with "could not find any test case for any mutant". Put the repo's no-database flag in `pytest_add_cli_args`.
 3. List survivors with `mutmut results` and read one with `mutmut show <mutant name>`.
 4. Delete the `mutants/` folder mutmut creates at the repo root; it holds a mutated copy of the project.
 
