@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# Runs AWS Emulator (https://github.com/aws/aws-emulator) in Docker on 127.0.0.1 only, telemetry off.
+# Usage: aws-emulator build [version] | start [port] | stop [port] | status [port] | logs [port]
+set -euo pipefail
+
+# Pinned release, matching GitHub tag v1.0.385. Package file names use the three-part version
+# (versions.json lists 1.0.385.1, but aws-emulator-1.0.385.1-1-*.rpm returns 403).
+# To upgrade, read the release notes, then run `aws-emulator build <new-version>` and update this line.
+VERSION_DEFAULT="1.0.385"
+IMAGE_REPO="aws-emulator"
+# Base image from the Docker guide, pinned by digest so a rebuild gets the same OS layer.
+BASE_IMAGE="public.ecr.aws/amazonlinux/amazonlinux:2023-minimal@sha256:158a9044f9dc0777f098b76c8b54346f6ed4560b9a6a416dec7a5ba3bc483af4"
+# AWS package-signing key fingerprint, from the "verify the package" step of the Linux guide.
+SIGNING_KEY_FPR="98BCF336A3BE53B734E967C52E5BF49BD940F624"
+# Marks containers this script started, so stop never touches anyone else's container.
+LABEL="agents.aws-emulator=1"
+DEFAULT_PORT=9297
+STATE_DIR="$HOME/.aws/emulator"
+
+die() { echo "aws-emulator: $*" >&2; exit 1; }
+
+need_docker() {
+  command -v docker >/dev/null || die "docker not found on PATH."
+  docker info >/dev/null 2>&1 || die "Docker isn't running. Start Docker Desktop and retry."
+}
+
+image_tag() { echo "$IMAGE_REPO:${1:-$VERSION_DEFAULT}"; }
+container_name() { echo "aws-emulator-$1"; }
+
+check_port() {
+  [[ "$1" =~ ^[0-9]+$ ]] && (( $1 >= 1 && $1 <= 65535 )) || die "port must be 1-65535, got '$1' (port 0 can't be forwarded by Docker)."
+}
+
+arch() {
+  case "$(uname -m)" in
+    arm64|aarch64) echo aarch64 ;;
+    x86_64|amd64) echo x86_64 ;;
+    *) die "unsupported CPU $(uname -m)." ;;
+  esac
+}
+
+cmd_build() {
+  local version="${1:-$VERSION_DEFAULT}" ctx
+  [[ "$version" =~ ^[0-9]+(\.[0-9]+)+$ ]] || die "version must look like 1.0.385, got '$version'."
+  need_docker
+  ctx="$(mktemp -d)"
+  trap 'rm -rf "$ctx"' RETURN
+  # Two stages: the first downloads the versioned package and fails the build unless
+  # AWS's signature on it checks out with the expected key; only then is it installed.
+  cat >"$ctx/Dockerfile" <<'EOF'
+ARG BASE_IMAGE=public.ecr.aws/amazonlinux/amazonlinux:2023-minimal
+FROM ${BASE_IMAGE} AS verify
+ARG VERSION
+ARG ARCH
+ARG SIGNING_KEY_FPR
+ADD https://downloads.aws.com/aws-emulator/packages/aws-emulator/LTS/aws-emulator-${VERSION}-1-${ARCH}.rpm /tmp/aws-emulator.rpm
+ADD https://downloads.aws.com/aws-emulator/packages/aws-emulator/LTS/aws-emulator-${VERSION}-1-${ARCH}.rpm.sig /tmp/aws-emulator.rpm.sig
+ADD https://downloads.aws.com/keys/gpg/current.asc /tmp/aws-publishing.asc
+RUN export GNUPGHOME=/tmp/gnupg && mkdir -m 700 "$GNUPGHOME" \
+    && gpg --batch --dearmor -o /tmp/aws-publishing.gpg /tmp/aws-publishing.asc \
+    && gpg --batch --no-default-keyring --keyring /tmp/aws-publishing.gpg \
+       --status-fd 1 --verify /tmp/aws-emulator.rpm.sig /tmp/aws-emulator.rpm > /tmp/verify.status \
+    && grep -E "^\[GNUPG:\] VALIDSIG .* ${SIGNING_KEY_FPR}$" /tmp/verify.status \
+    || { echo "package signature check FAILED"; cat /tmp/verify.status; exit 1; }
+
+FROM ${BASE_IMAGE}
+COPY --from=verify /tmp/aws-emulator.rpm /tmp/aws-emulator.rpm
+ARG VERSION
+RUN rpm -i /tmp/aws-emulator.rpm && rm /tmp/aws-emulator.rpm \
+    && aws-emulator -v | grep -qw "${VERSION}" || { echo "installed version is not ${VERSION}"; aws-emulator -v; exit 1; } \
+    && mkdir -p /home/emulator && chown 1000 /home/emulator
+USER 1000
+ENV HOME=/home/emulator
+EXPOSE 9297
+ENTRYPOINT ["aws-emulator", "-b", "0.0.0.0"]
+EOF
+  docker build --pull=false -t "$(image_tag "$version")" \
+    --build-arg BASE_IMAGE="$BASE_IMAGE" --build-arg VERSION="$version" \
+    --build-arg ARCH="$(arch)" --build-arg SIGNING_KEY_FPR="$SIGNING_KEY_FPR" \
+    "$ctx" || die "build failed (see output above)."
+  echo "Built $(image_tag "$version"):"
+  docker run --rm --entrypoint aws-emulator "$(image_tag "$version")" -v
+}
+
+cmd_start() {
+  local port="${1:-$DEFAULT_PORT}" name image
+  check_port "$port"
+  need_docker
+  name="$(container_name "$port")"
+  image="$(image_tag)"
+  docker image inspect "$image" >/dev/null 2>&1 || die "image $image not found. Run: aws-emulator build"
+  if docker container inspect "$name" >/dev/null 2>&1; then
+    die "container $name already exists ($(docker inspect -f '{{.State.Status}}' "$name")). Run: aws-emulator stop $port"
+  fi
+  if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+    die "port $port is already in use on this machine. Pick another: aws-emulator start <port>"
+  fi
+  mkdir -p "$STATE_DIR"
+  # HOME and the mount use the host path, so the files the emulator writes resolve on the host too.
+  # --memory 2g with no swap follows the Docker guide; over the limit it exits 137 and loses state.
+  docker run -d --name "$name" --label "$LABEL" --restart no --rm \
+    --memory=2g --memory-swap=2g \
+    -p "127.0.0.1:$port:$port" \
+    -e HOME="$HOME" -e EMULATOR_TELEMETRY=off \
+    -v "$STATE_DIR:$STATE_DIR" \
+    "$image" -p "$port" --telemetry off >/dev/null || die "docker run failed."
+
+  local ca="$STATE_DIR/$port/ca.pem"
+  for _ in $(seq 30); do
+    if [[ -f "$ca" ]] && curl -sf --cacert "$ca" "https://127.0.0.1:$port/__admin/health" >/dev/null 2>&1; then
+      echo "AWS Emulator $VERSION_DEFAULT ready on https://127.0.0.1:$port (container $name)."
+      docker logs "$name" 2>&1 | grep -i telemetry || true
+      return 0
+    fi
+    docker container inspect "$name" >/dev/null 2>&1 || die "container exited during startup. It runs with --rm, so check 'docker events' or start it in the foreground to see why."
+    sleep 1
+  done
+  die "not healthy after 30s. See: aws-emulator logs $port"
+}
+
+own_container() {
+  local name; name="$(container_name "$1")"
+  docker container inspect "$name" >/dev/null 2>&1 || return 1
+  [[ "$(docker inspect -f '{{index .Config.Labels "agents.aws-emulator"}}' "$name")" == "1" ]] \
+    || die "container $name exists but wasn't started by this script; leaving it alone."
+}
+
+cmd_stop() {
+  local port="${1:-$DEFAULT_PORT}"
+  check_port "$port"; need_docker
+  own_container "$port" || { echo "No emulator running on port $port."; return 0; }
+  # docker stop sends SIGTERM, a clean stop: the emulator deletes its files in ~/.aws/emulator/<port>/.
+  docker stop "$(container_name "$port")" >/dev/null
+  echo "Stopped $(container_name "$port"). Emulated resources are gone."
+}
+
+cmd_status() {
+  local port="${1:-$DEFAULT_PORT}"
+  check_port "$port"; need_docker
+  own_container "$port" || { echo "Not running (port $port)."; return 3; }
+  docker ps --filter "name=^$(container_name "$port")$" --format '{{.Names}}  {{.Image}}  {{.Status}}  {{.Ports}}'
+  if curl -sf --cacert "$STATE_DIR/$port/ca.pem" "https://127.0.0.1:$port/__admin/health" >/dev/null 2>&1; then
+    echo "health: ok"
+  else
+    echo "health: not responding"; return 1
+  fi
+}
+
+cmd_logs() {
+  local port="${1:-$DEFAULT_PORT}"
+  check_port "$port"; need_docker
+  own_container "$port" || die "no emulator running on port $port."
+  docker logs "$(container_name "$port")"
+}
+
+case "${1:-}" in
+  build)  shift; cmd_build "$@" ;;
+  start)  shift; cmd_start "$@" ;;
+  stop)   shift; cmd_stop "$@" ;;
+  status) shift; cmd_status "$@" ;;
+  logs)   shift; cmd_logs "$@" ;;
+  *) echo "Usage: aws-emulator build [version] | start [port] | stop [port] | status [port] | logs [port]" >&2; exit 2 ;;
+esac
