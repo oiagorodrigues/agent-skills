@@ -11,9 +11,10 @@ diagram: one icon box per component, flowing top to bottom, with orthogonal
 arrows. It is the diagram engine for the whole plugin; the orchestrator and the
 building blocks hand off here when it's time to draw.
 
-The script needs Python 3.9+ and nothing else. Icons are stored in `icons/`, so
-rendering never touches the network. The SVG carries its own background, so it
-reads the same in light and dark Markdown viewers.
+The script needs Python 3.9+ and nothing else. The skill stores no icons: the
+first render that uses an icon downloads it from its official source into a
+local cache, so that render needs the network (see "Icons"). The SVG carries its
+own background, so it reads the same in light and dark Markdown viewers.
 
 ## When to reach for this
 
@@ -32,6 +33,7 @@ sketch in the conversation is fine for early thinking.
    R=~/.agents/skills/system-design/topics/architecture-diagram/scripts/render_diagram.py
    python3 $R design.json -o docs/architecture.svg    # for Markdown
    python3 $R design.json -o architecture.html        # standalone page
+   python3 $R design.json -o docs/architecture.svg --offline   # use only cached icons
    ```
    In Markdown, embed the SVG as an image: `![Checkout architecture](architecture.svg)`.
    It renders on GitHub, in VS Code and in Obsidian, because it has no scripts,
@@ -40,7 +42,9 @@ sketch in the conversation is fine for early thinking.
    running through a box or a group title, a group covering a box that isn't in
    it, overlapping groups, a label with more than three words, a label that names
    several components, and an edge label with no free spot. Run with `--strict`
-   to make any warning exit with code 2. Most fixes are a `col` change.
+   to make any warning exit with code 2. Most fixes are a `col` change. An icon
+   that can't be fetched (offline, or a name the source doesn't have) is left
+   out of its box with a warning; that warning doesn't count for `--strict`.
 4. Look at the result before handing it over. `sips` renders the SVG at its real
    size (`qlmanage -t` crops to a square), then open the PNG with the Read tool.
    ```bash
@@ -119,30 +123,55 @@ The diagram answers one question: what talks to what, over which network.
 
 ## Icons
 
-`python3 $R --list-icons` prints every icon name. There are three sets:
+`python3 $R --list-icons` prints every catalog key by family. A node or group
+`icon` is either a catalog key or `family:name`, which reaches any icon of a
+family without a catalog entry.
 
-- `generic` (64): line glyphs such as `user`, `users`, `browser`, `mobile`,
-  `server`, `database`, `cache`, `queue`, `stream`, `bucket`, `cdn`,
-  `load-balancer`, `dns`, `gateway`, `lambda`, `container`, `scheduler`, `email`,
-  `webhook`, `lock`, `key`, `shield`, `monitoring`, `logs`, `bot`.
-- `aws` (25): AWS service names such as `aws-lambda`, `aws-s3`, `aws-rds`,
-  `aws-sqs`, `aws-ecs`, `aws-eks`, `aws-api-gateway`, `aws-dynamodb`,
-  `aws-elasticache`, `aws-cognito`, `aws-secrets-manager`, `aws-cloudwatch`,
-  `aws-route53`, `aws-elb`, each drawn with a generic glyph for the service,
-  because AWS logos can't be redistributed.
-- `brands` (51): vendor logos by Simple Icons slug, such as `stripe`, `auth0`,
-  `datadog`, `sentry`, `postgresql`, `redis`, `apachekafka`, `github`,
-  `cloudflare`. `microsoftazure`, `openai`, `salesforce`, `sendgrid`, `slack` and
-  `twilio` use generic glyphs, because Simple Icons no longer carries them.
+- `aws`: AWS Architecture Icons, full color. Keys such as `aws-lambda`,
+  `aws-s3`, `aws-rds`, `aws-sqs`, `aws-ecs`, `aws-eks`, `aws-api-gateway`,
+  `aws-dynamodb`, `aws-elasticache`, `aws-cognito`, `aws-cloudwatch`,
+  `aws-route53`, `aws-elb`, and `aws` (the AWS Cloud logo for a group). Any
+  other service: `aws:Arch_Amazon-Aurora_64`.
+- `azure` and `gcp`: the Azure and Google Cloud architecture icons, full color,
+  by file name, such as `azure:10023-icon-service-Kubernetes-Services` and
+  `gcp:BigQuery-512-color`. `microsoftazure` and `googlecloudstorage` are keys.
+- `simple-icons`: vendor logos by Simple Icons slug, drawn white on the kind
+  tile, such as `stripe`, `auth0`, `datadog`, `sentry`, `postgresql`, `redis`,
+  `apachekafka`, `docker`, `kubernetes`, `github`, `cloudflare`.
+- `lucide` (and `tabler` for `bucket`): line glyphs drawn white on the kind
+  tile, such as `user`, `users`, `browser`, `mobile`, `server`, `database`,
+  `cache`, `queue`, `stream`, `cdn`, `load-balancer`, `dns`, `gateway`,
+  `lambda`, `container`, `scheduler`, `email`, `webhook`, `lock`, `key`,
+  `shield`, `monitoring`, `logs`, `bot`.
 
-`icons/SOURCES.md` records where each set comes from and its license. To add an
-icon, add an entry with a 24x24 `body` to the matching JSON file; `style` is
-`stroke` for line glyphs and `fill` for solid logos.
+Full-color icons (AWS, Azure, Google Cloud) replace the kind tile and keep their
+own colors; the box border and edges still follow the kind. One-color glyphs sit
+white on the tile.
+
+`scripts/fetch_icons.py` does the fetching; the renderer calls it for every icon
+the spec uses.
+
+- The cache is `$SYSTEM_DESIGN_ICON_CACHE`, else
+  `${XDG_CACHE_HOME:-~/.cache}/agents/system-design-icons`, with one
+  `<family>/<version>/` folder per icon set. Each holds `downloads/` (each download in its own folder; the AWS, Azure and
+  Google zips are downloaded once), `extracted/` (the SVGs taken from a zip)
+  and `icons/<name>.json` (the converted icon with its source URL and version).
+- Downloads are untrusted: zips are only read, SVGs with a DOCTYPE or entity
+  declaration are refused, and only plain shapes, gradients and same-document
+  references are kept.
+- `F=$(dirname $R)/fetch_icons.py`, then `python3 $F --list aws` lists the names
+  in an archive family (also `azure`, `gcp`, `gcp-category`), and
+  `python3 $F aws-lambda aws:Arch_Amazon-Aurora_64` fetches icons ahead of a
+  render, for example before going offline.
+
+To add a key, add `"key": "family:name"` to `icons/catalog.json`.
+`icons/SOURCES.md` lists each family's official source, pinned version, terms
+and how a name maps to a file.
 
 ## Example
 
-`assets/examples/web-app.json` renders to `assets/examples/web-app.svg` and
-`assets/examples/web-app.html`.
+`assets/examples/web-app.json` is a full spec. The rendered output isn't kept in
+the repo because it would embed AWS icons; render it to see it.
 
 ## Interactive / collaborative mode (optional)
 
@@ -161,4 +190,4 @@ with a Copy button. See `references/interactive.md`.
 - `references/design-system.md`: what the renderer draws and why (sizes, colors,
   routing, checks). Read it before changing the script.
 - `references/interactive.md`: the optional interactive diagram pattern.
-- `icons/SOURCES.md`: icon sources and licenses.
+- `icons/SOURCES.md`: icon sources, versions and terms.

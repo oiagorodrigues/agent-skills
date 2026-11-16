@@ -4,14 +4,17 @@
     render_diagram.py SPEC.json -o diagram.svg             # for Markdown: ![Architecture](diagram.svg)
     render_diagram.py SPEC.json -o diagram.html            # standalone page with SVG/PNG/print buttons
     render_diagram.py SPEC.json -o diagram.svg --strict    # exit 2 when the layout has any warning
+    render_diagram.py SPEC.json -o diagram.svg --offline   # draw only icons already in the cache
     render_diagram.py --list-icons
 
-The spec format is in ../README.md. Python 3.9+ standard library only; it never touches the network.
+The spec format is in ../README.md. Python 3.9+ standard library only. Icons come from fetch_icons.py,
+which downloads the ones missing from its cache; an icon it can't get is left out with a warning.
 """
 from __future__ import annotations
 
 import argparse
 import heapq
+import importlib.util
 import json
 import sys
 import textwrap
@@ -20,7 +23,6 @@ from html import escape
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ICON_DIR = HERE.parent / "icons"
 TEMPLATE = HERE.parent / "assets" / "template.html"
 
 KIND_COLORS = {
@@ -126,11 +128,17 @@ class Route:
         return []
 
 
-def load_icons() -> dict[str, dict]:
-    icons: dict[str, dict] = {}
-    for path in sorted(ICON_DIR.glob("*.json")):
-        icons.update(json.loads(path.read_text(encoding="utf-8")))
-    return icons
+def load_fetcher():
+    # Loaded by path so the import works under `python -I`, which leaves the script's folder off sys.path.
+    sys.dont_write_bytecode = True  # keep __pycache__ out of the skill folder
+    spec = importlib.util.spec_from_file_location("fetch_icons", HERE / "fetch_icons.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["fetch_icons"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+fetch_icons = load_fetcher()
 
 
 def text_width(text: str, size: float, bold: bool = False) -> float:
@@ -152,7 +160,7 @@ def tint(color: str, amount: float, base: str) -> str:
 # ---------- spec ----------
 
 class Diagram:
-    def __init__(self, spec: dict, icons: dict[str, dict]) -> None:
+    def __init__(self, spec: dict, catalog: dict[str, str]) -> None:
         if not isinstance(spec, dict):
             raise SpecError("the spec must be a JSON object")
         self.title = spec.get("title") or ""
@@ -161,7 +169,8 @@ class Diagram:
             raise SpecError(f"theme must be one of {sorted(THEMES)}")
         self.theme = THEMES[self.theme_name]
         self.cards = spec.get("cards") or []
-        self.icons = icons
+        self.catalog = catalog
+        self.icons: dict[str, dict] = {}
         self.warnings: list[str] = []
         self.nodes: dict[str, dict] = {}
         self.groups: dict[str, dict] = {}
@@ -193,7 +202,7 @@ class Diagram:
         if kind not in KIND_COLORS:
             raise SpecError(f"node {nid!r}: kind {kind!r} is not one of {sorted(KIND_COLORS)}")
         icon = node.get("icon") or DEFAULT_ICONS[kind]
-        if icon not in self.icons:
+        if not self.known_icon(icon):
             raise SpecError(f"node {nid!r}: unknown icon {icon!r} (run --list-icons)")
         if not isinstance(node.get("row"), int) or node["row"] < 0:
             raise SpecError(f"node {nid!r}: row must be a whole number, 0 at the top")
@@ -217,9 +226,16 @@ class Diagram:
         if kind not in KIND_COLORS:
             raise SpecError(f"group {gid!r}: kind {kind!r} is not one of {sorted(KIND_COLORS)}")
         icon = group.get("icon")
-        if icon and icon not in self.icons:
-            raise SpecError(f"group {gid!r}: unknown icon {icon!r}")
+        if icon and not self.known_icon(icon):
+            raise SpecError(f"group {gid!r}: unknown icon {icon!r} (run --list-icons)")
         self.groups[gid] = {**group, "id": gid, "label": group.get("label") or gid, "kind": kind}
+
+    def known_icon(self, key: str) -> bool:
+        return fetch_icons.is_known(key, self.catalog)
+
+    def icon_keys(self) -> list[str]:
+        keys = [n["icon"] for n in self.nodes.values()] + [g["icon"] for g in self.groups.values() if g.get("icon")]
+        return list(dict.fromkeys(keys))
 
     def _check_cycle(self, gid: str) -> None:
         seen = {gid}
@@ -710,12 +726,31 @@ def place_labels(lay: Layout, routes: list[Route]) -> tuple[list[tuple[Box, str]
 
 # ---------- SVG ----------
 
+def tile_with_icon(d: Diagram, icon: str, color: str, *, x: float, y: float, tile: float, radius: float,
+                   glyph: float) -> str:
+    """A full-color icon fills the tile's square itself; a one-color glyph sits on a tile in the kind color."""
+    if d.icons.get(icon, {}).get("paint") == "color":
+        return icon_markup(d, icon, x, y, tile)
+    rect = (f'<rect x="{fmt(x)}" y="{fmt(y)}" width="{fmt(tile)}" height="{fmt(tile)}" rx="{fmt(radius)}" '
+            f'fill="{color}"/>')
+    return rect + icon_markup(d, icon, x + (tile - glyph) / 2, y + (tile - glyph) / 2, glyph)
+
+
 def icon_markup(d: Diagram, icon: str, x: float, y: float, size: float) -> str:
-    data = d.icons[icon]
-    s = size / 24
-    paint = ('fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'
-             if data["style"] == "stroke" else 'fill="#ffffff"')
-    return f'<g transform="translate({fmt(x)} {fmt(y)}) scale({s:.4f})" {paint}>{data["body"]}</g>'
+    """One-color glyphs are drawn white for a kind-colored tile; full-color icons are drawn as they are."""
+    data = d.icons.get(icon)
+    if data is None:
+        return ""
+    min_x, min_y, w, h = data["viewBox"]
+    s = size / max(w, h)
+    tx = x + (size - w * s) / 2 - min_x * s
+    ty = y + (size - h * s) / 2 - min_y * s
+    paint = {
+        "stroke": ' fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"',
+        "fill": ' fill="#ffffff"',
+        "color": "",
+    }[data["paint"]]
+    return f'<g transform="translate({fmt(tx)} {fmt(ty)}) scale({s:.4f})"{paint}>{data["body"]}</g>'
 
 
 def rounded_path(points: list, radius: float = 6) -> str:
@@ -787,8 +822,7 @@ def render_svg(d: Diagram, show_title: bool = True) -> tuple[str, list[str]]:
                    f'fill="{tint(color, th["frame_fill"], th["bg"])}" stroke="{color}" stroke-width="1.5"{dash}/>')
         tx = b.x + 12
         if g.get("icon"):
-            out.append(f'<rect x="{fmt(b.x + 10)}" y="{fmt(b.y + 7)}" width="24" height="24" rx="5" fill="{color}"/>')
-            out.append(icon_markup(d, g["icon"], b.x + 13, b.y + 10, 18))
+            out.append(tile_with_icon(d, g["icon"], color, x=b.x + 10, y=b.y + 7, tile=24, radius=5, glyph=18))
             tx = b.x + 42
         out.append(f'<text x="{fmt(tx)}" y="{fmt(b.y + 24)}" font-size="13" font-weight="600" '
                    f'fill="{th["ink"]}">{escape(g["label"])}</text>')
@@ -817,8 +851,7 @@ def render_svg(d: Diagram, show_title: bool = True) -> tuple[str, list[str]]:
         out.append(f'<rect x="{fmt(b.x)}" y="{fmt(b.y)}" width="{NODE_W}" height="{NODE_H}" rx="8" '
                    f'fill="{th["card"]}" stroke="{th["card_stroke"]}" stroke-width="1.2"{dash}/>')
         ty = b.y + (NODE_H - TILE) / 2
-        out.append(f'<rect x="{fmt(b.x + 10)}" y="{fmt(ty)}" width="{TILE}" height="{TILE}" rx="6" fill="{color}"/>')
-        out.append(icon_markup(d, n["icon"], b.x + 10 + (TILE - ICON) / 2, ty + (TILE - ICON) / 2, ICON))
+        out.append(tile_with_icon(d, n["icon"], color, x=b.x + 10, y=ty, tile=TILE, radius=6, glyph=ICON))
         lines, size = node_lines(n["label"])
         line_h = size * 1.25
         first = b.cy - (len(lines) - 1) * line_h / 2 + size * 0.35
@@ -862,14 +895,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("-o", "--output", help="output file; .svg or .html")
     ap.add_argument("--format", choices=("svg", "html"), help="defaults to the output file's extension")
     ap.add_argument("--strict", action="store_true", help="exit 2 when the layout has any warning")
-    ap.add_argument("--list-icons", action="store_true", help="print the icon names by source and exit")
+    ap.add_argument("--offline", action="store_true", help="draw only icons already in the cache; never download")
+    ap.add_argument("--list-icons", action="store_true", help="print the icon keys by family and exit")
     args = ap.parse_args(argv)
 
-    icons = load_icons()
     if args.list_icons:
-        for path in sorted(ICON_DIR.glob("*.json")):
-            print(f"{path.stem}: " + " ".join(sorted(json.loads(path.read_text(encoding="utf-8")))))
-        return 0
+        return fetch_icons.main(["--keys"])
     if not args.spec or not args.output:
         ap.error("spec and --output are required")
     fmt_name = args.format or Path(args.output).suffix.lstrip(".").lower()
@@ -877,16 +908,18 @@ def main(argv: list[str] | None = None) -> int:
         ap.error("pass --format svg|html or use a .svg/.html output name")
     try:
         spec = json.loads(Path(args.spec).read_text(encoding="utf-8"))
-        diagram = Diagram(spec, icons)
+        diagram = Diagram(spec, fetch_icons.load_catalog())
+        diagram.icons, icon_warnings = fetch_icons.ensure(diagram.icon_keys(), offline=args.offline)
         text, warnings = render_html(diagram) if fmt_name == "html" else render_svg(diagram)
-    except (SpecError, json.JSONDecodeError, OSError) as exc:
+    except (SpecError, fetch_icons.IconError, json.JSONDecodeError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     Path(args.output).write_text(text, encoding="utf-8")
-    for w in dict.fromkeys(warnings):
+    for w in dict.fromkeys(icon_warnings + warnings):
         print(f"warning: {w}", file=sys.stderr)
+    missing = f", {len(icon_warnings)} icons left out" if icon_warnings else ""
     print(f"wrote {args.output} ({len(diagram.nodes)} boxes, {len(diagram.edges)} edges, "
-          f"{len(dict.fromkeys(warnings))} warnings)", file=sys.stderr)
+          f"{len(dict.fromkeys(warnings))} warnings{missing})", file=sys.stderr)
     return 2 if args.strict and warnings else 0
 
 

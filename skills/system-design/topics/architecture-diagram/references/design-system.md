@@ -9,8 +9,12 @@ changing the script; to draw a diagram, the README is enough.
   in the kind color on the left, a white 26px icon on the tile, and the label in
   14px semibold system sans-serif (`-apple-system, BlinkMacSystemFont, 'Segoe UI',
   Helvetica, Arial, sans-serif`). Labels wrap to two lines, or three at 12px.
+  A full-color vendor icon (AWS, Azure, Google Cloud) takes the tile's place at
+  40px with its own colors; Azure's terms ask for icons as they appear in Azure.
+  An icon that couldn't be fetched leaves the tile empty.
 - Group frames: a rounded rectangle in the group's kind color with a 5% tint fill
-  (10% in dark), the title at the top left after an optional 24px icon tile.
+  (10% in dark), the title at the top left after an optional 24px icon tile, or
+  a 24px full-color icon.
   Nested frames add 16px of padding per level and 36px for each title.
 - Edges: 1.6px lines in a muted gray with rounded corners and a filled triangle
   arrowhead drawn as a polygon, so no SVG markers are needed. Labels sit in a
