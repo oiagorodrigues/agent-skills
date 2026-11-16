@@ -29,7 +29,13 @@ Patterns: `AKIA[0-9A-Z]{16}`, `-----BEGIN [A-Z ]*PRIVATE KEY`, `sk-[A-Za-z0-9_-]
 - A secret committed in any commit of the branch is leaked even if a later commit removes it, because history keeps it. The fix is rotation, not deletion; say so in the finding.
 - Mask the value in the report (first four characters, then `…`). Never paste a full secret into a report, PR comment or chat.
 - Public identifiers (a publishable Stripe key, an Auth0 client ID for an SPA, a Sentry DSN) aren't secrets. Check the key type before reporting.
-- `gitleaks` and `trufflehog` aren't installed on this machine. If the user installs one, run it on the branch's commits as a cross-check.
+- Cross-check with gitleaks over the branch's commits. It has no official npm package (the `gitleaks` package on npm is someone else's project, and the npm wrappers download a binary at run time), so there is no `npx` or `pnpm dlx` form. Run the official image, which installs nothing (pin the version):
+
+  ```
+  docker run --rm -v "$PWD:/repo:ro" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --no-banner --redact --log-opts="<base>..HEAD"
+  ```
+
+  Drop `--log-opts` to scan the whole history, and use `dir /repo` instead of `git /repo` for files not yet committed. With gitleaks installed (`brew install gitleaks`), the same arguments work without `docker run`. `--redact` keeps the values out of the output. Each finding has a fingerprint; a confirmed false positive goes in the repo's `.gitleaksignore`, one fingerprint per line.
 
 ## PII in logs and telemetry
 
