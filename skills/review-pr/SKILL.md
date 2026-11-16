@@ -68,7 +68,7 @@ Use `/loop` (or the harness's scheduler) to repeat passes when the user wants it
 
 Use for the user's own branch before a PR exists ("review my branch", `/review-pr local`). Same flow as mode 1, without GitHub:
 
-- Diff against the base branch (`git diff <base>...HEAD`) in the current checkout.
+- Diff against the base branch (`git diff <base>...HEAD`) in the current checkout. `scripts/review-bundle.sh <worktree> <base> <out-file> [planned-files]` puts the diff, the commits, files changed outside the plan, callers of changed exports and touched tests in one file.
 - Run the repo's local gates instead of waiting for CI: lint, type check and the tests for the changed files, using the commands the repo defines (`package.json` scripts, `Makefile`, `pyproject.toml`, CI workflow files) and the limits in "Running tests locally". A failing gate is reported as a finding with its output.
 - Build the intent the same way, before reading code: the Jira ticket the branch names (ACs and checklist, after the same relatedness check), the draft PR description if there is one, and `git log <base>..HEAD`.
 - For a change a user or another service can see, exercise it (start the app and drive the flow, call the endpoint, run the job) and attach the proof per AC; a reading of the code is not a pass.

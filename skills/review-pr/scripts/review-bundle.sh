@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the review input for a ticket's branch with git, so the verify and PR stages read one
+# Builds the review input for a branch with git, so a reviewer, a verifier or a PR step reads one
 # file instead of rediscovering the diff and its callers one tool call at a time. Read-only.
 #   review-bundle.sh <worktree> <base> <out-file> [planned-files]
 # planned-files lists the paths the plan said to change (one per line, globs allowed); files
