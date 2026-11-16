@@ -16,13 +16,13 @@ When a rule names a file under `references/`, read that file for the reasoning a
 ## How to work
 
 - Read the target files, their tests and the closest sibling before changing anything, and follow the pattern the surrounding code already uses.
-- Don't guess. Confirm every claim in the code, the docs or real data before you state it. Ask when the instructions are ambiguous, when several approaches look equally valid, or when a change would alter public behavior. Write down working assumptions until they are verified.
+- Don't guess. Confirm every claim before you state it, as "Facts and evidence" in `~/.agents/AGENTS.md` says. Ask when the instructions are ambiguous, when several approaches look equally valid, or when a change would alter public behavior. Write down working assumptions until they are verified.
 - Before copying how an earlier PR solved something, check what actually happened. A past PR only shows what someone tried, and its own conclusions can be wrong: one PR claimed Terraform couldn't archive a repo when the real failure was the order of operations.
   - Read its CI or apply logs and comments for the exact error and the order of operations. "The apply failed" doesn't mean "the tool can't do this".
   - Search the repo for the established pattern before inventing one.
   - When a diff keeps coming back, find out why before working around it.
   - Pick the option that leaves things correct and managed, not the one that gets a green check fastest.
-  - Never put an inference in a PR description as fact. Check it first, or label it as an assumption.
+  - Never carry a past PR's conclusion into your PR description as fact. Check it first, or word it as an inference from its evidence ("Facts and evidence" in `~/.agents/AGENTS.md`).
 - Make the baseline green before you start, so a later failure can be attributed to your change.
 - Never call an error, warning or failing test "pre-existing" or "unrelated" until you reproduced it, traced it to its source and showed it fails without your change (on the base branch, or with `git log`/`git blame`). If it is real and fixable, fix it in a commit separate from the feature or cleanup work, so the fix can be reviewed on its own.
 - To find the cause of a bug or failure, follow the `debugging` skill: a feedback loop that goes red on the symptom comes before any theory.
@@ -32,13 +32,13 @@ When a rule names a file under `references/`, read that file for the reasoning a
 - When the user corrects the same mistake twice, turn the correction into a rule where it will be read again (a lint rule, a type, a test, a line in the checks file a verifier runs, or a line in the skill or AGENTS.md) with the `correct` skill, instead of only fixing the instance.
 - When building or reviewing an agent workflow, writing acceptance criteria for agent work, or when agent-written code keeps needing the same fixes, read `references/reducing-ai-slop.md` (poteto's seven steps, verification-loop rules, and how a pipeline applies them: plan check, tests from a separate step, an isolated read-only verifier, `CHECKS.md`).
 - Stay in scope. Change only what the task needs, with the smallest diff: no drive-by refactors, renames, reformatting or rewritten comments in code you weren't asked to touch. Do fix a real bug you find in the code you are touching, minimally.
-- Remove the imports, functions, variables and files your own change left unused. Leave dead code that was already there alone and mention it instead.
+- Remove the imports, functions, variables, files and old paths your own change left unused (an old path once every caller moved), and don't leave commented-out blocks behind. Leave dead code that was already there alone and mention it instead.
 - Don't design for rare or future cases nobody asked about, and don't add fallbacks, defaults or substitutes nobody asked for. A named default is the whole rule.
 - Write down the definition of done and what is out of scope before starting larger work, as criteria that pass or fail, each with how it gets checked. A criterion that can't fail ("works correctly") isn't one.
 - For work across several layers, build one thin path that runs end to end (UI, API, service, storage) before filling in any layer, a tracer bullet (`references/delivery-rules.md`).
 - Verify before claiming done. Passing tests are not proof that a user-visible change works: exercise it in the running system, and prove a write by comparing the stored record before and after. Probe the variants, not only the happy path: empty input, each role, logged out, every flag value. Save the proof of each check (a screenshot written to disk, the command and its output, the query and its result) and list where it is in the report, as `references/reducing-ai-slop.md` asks of the verifier. A check whose proof was only looked at, not saved, doesn't count.
 - Run checks scoped to what changed, with commands that exit. On the user's own PR work, run lint and the type check locally, push, and let CI run the test suites, then check the CI result before calling it done. Run a single targeted test locally only to debug a failure. Don't leave watch processes running, don't run repo-wide fixers on files you didn't edit, and report every check you skipped and why.
-- If a check still fails after about three fix attempts, each on a changed hypothesis, stop and report the command and its error. Never undo your own work, loosen a test or silence a tool just to make a check pass.
+- If a check still fails after about three fix attempts, each on a changed hypothesis, stop and report the command and its error. Never undo your own work or silence a tool just to make a check pass; a failing test follows "Never fix a failing test" under Testing.
 - Before declaring done, re-read your own diff for edge cases, contradictions with the surrounding code, drift from the request, and every caller of what you changed. Stop after two or three passes and summarize.
 - Report what you changed, the decisions you made, every deliberate deviation with its reason, and what you could not verify.
 - Leave shared environments as you found them: no commits on a shared checkout, close what you opened, keep scratch files out of the repo, and use one isolated worktree or branch per unit of work.
@@ -192,6 +192,8 @@ When a rule names a file under `references/`, read that file for the reasoning a
 
 ## Security
 
+These are the rules for writing code. To review a diff, PR or feature for security, follow the `security-review` skill, which owns the review workflow, the per-stack checks and severity.
+
 - Authorization has two parts: may this caller use the operation, and which records may they see or change. New endpoints deny by default, and every request with an id is tested with another tenant's id. Separate client authorization (which app may call) from subject authorization (what this user may do).
 - Treat every input as attacker-controlled: validate it, and anchor patterns so prefixes can't collide.
 - No secrets in code, config committed in plain text, logs, errors or responses. Secrets live in an encrypted store, are injected through config and are wrapped so they don't print.
@@ -200,7 +202,7 @@ When a rule names a file under `references/`, read that file for the reasoning a
 - Internal or debug endpoints are environment-gated, separately authenticated and as small as possible.
 - Use synthetic data locally and mock third-party APIs so partners don't receive test traffic.
 - Known security gaps go to the private tracker, not into repo docs or public threads.
-- Automation and agents run with least-privilege credentials, an explicit tool allowlist and pinned third-party actions; checks fail closed. Agents never type credentials and never merge their own work.
+- Automation and agents run with least-privilege credentials, an explicit tool allowlist and pinned third-party actions; checks fail closed. Agents never type credentials and merge only when a person asks.
 
 ## Data, schema and contract changes
 
@@ -225,7 +227,7 @@ When a rule names a file under `references/`, read that file for the reasoning a
 - An error-level log says what happened, to what and why, with what's needed to reproduce, and is used only for real errors because it pages someone. Warnings for unusual-but-not-urgent; debug and info sparingly.
 - Telemetry tags (environment, service, version) match the application's own values.
 - Define latency and availability objectives from real baselines and tighten them over time.
-- Claims about production come with the number, the time window, the query and a link. Name the gaps in detection out loud.
+- Back claims about production with the `prod-evidence` skill, which sets what the proof includes. Name the gaps in detection out loud.
 
 ## Feature flags and config
 
@@ -241,7 +243,7 @@ When a rule names a file under `references/`, read that file for the reasoning a
 
 - Declare what you import as a direct dependency; never lean on a transitive one. Peer dependencies stay peer.
 - Use one package manager per repo, manage shared tool versions in one place, commit lockfiles, and pin published consumers to exact versions.
-- No unused imports or dependencies. Keep runtime images small. Write code for the oldest runtime you deploy to.
+- No unused dependencies (unused imports follow the dead-code rule under "How to work"). Keep runtime images small. Write code for the oldest runtime you deploy to.
 - After a dependency bump, look for code that relied on the old version's side effects (event order, globals, defaults). When an upgrade breaks things, separate pre-existing problems first and fix them on the old version, in their own change.
 - Don't bypass a dependency age gate (a package manager's minimum-release-age exclusion, a Renovate `minimumReleaseAge` override or any equivalent), even for a security fix. When the fixed version is still inside the window, wait until it clears, or pick an older version that already clears it and say in the PR what it leaves unfixed and the date the version clears the gate.
 - Runtime and build-tool updates get human review; majors wait for explicit approval.
@@ -260,13 +262,12 @@ When a rule names a file under `references/`, read that file for the reasoning a
 - Commits and PR titles follow Conventional Commits (lowercase, imperative), with breaking changes marked. Fix lint and check failures in the same commit, not a fixup.
 - Keep PRs small and single-purpose; don't mix refactors or cleanups into a feature or fix. Link the ticket.
 - When a rename, extract or move would make a behavior change smaller, propose it to the user as a separate PR that changes no behavior and lands first (tidy first); squash merge erases separate commits, so only a separate PR keeps it apart (`references/delivery-rules.md`).
-- PR descriptions follow the `create-pr` skill. Detail on a confusing change goes in an inline PR comment, not a code comment.
+- PR descriptions follow the `create-pr` skill. Detail on a confusing change follows the "current state only" rule under "Comments and docstrings".
 - Every PR is rebased onto the current base and re-tested before it lands, passes CI, and is reviewed by a person with domain knowledge.
-- Land PRs with a squash merge so the base branch stays linear, with one single-line commit per PR: the PR title plus `(#N)` and an empty body, as in `gh pr merge N --squash --subject "<PR title> (#N)" --body ""`. Never land a PR with a merge commit or a commit-list body. A repo's own merge rule wins.
+- Merge only when the user asks you to land that PR ("Local work" in `~/.agents/AGENTS.md`). Then land it with a squash merge so the base branch stays linear, with one single-line commit per PR: the PR title plus `(#N)` and an empty body, as in `gh pr merge N --squash --subject "<PR title> (#N)" --body ""`. Never land a PR with a merge commit or a commit-list body. A repo's own merge rule wins.
 - A script that merges several PRs checks each test and build exit code and stops at the first failure, before the merge call. After a scripted conflict resolution, diff the result for encoding damage (non-ASCII text, line endings) before it lands.
 - Open an issue or proposal before a large change. Write an ADR only for a decision that is hard to reverse, would surprise a future reader and came from a real trade-off (from Matt Pocock's domain-modeling, MIT; format in `references/delivery-rules.md`).
 - Docs hold only current-state material. Plans go in PRs and issues and are deleted when done. A change to architecture or a contract updates its doc in the same PR.
-- Review work follows the `review-pr` skill, which owns the review bar, caller tracing and verifying each finding. Problems that predate the PR stay out of it unless the PR makes them reachable, and suggest a fix only when you have run the covering check on that exact text.
-- Remove dead code: no unused bindings, commented-out blocks or old paths kept after every caller moved.
+- Review work follows the `review-pr` skill, which owns the review bar, caller tracing, how to file problems that predate the PR, and verifying each finding. Suggest a fix only when you have run the covering check on that exact text.
 - When a user-visible change can't be verified, say so in the PR and why.
 - Test changes to agent rules or prompts empirically, against past cases chosen before the run, because the output varies between runs.
