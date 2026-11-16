@@ -195,6 +195,10 @@ After adding, renaming or removing a skill, run `~/.agents/bin/link-skills.sh`. 
 - `correct`: turns a repeated agent mistake into a rule that enforces itself.
 - `retro`: reviews an agent session and proposes fixes to rules and skills.
 
+## Before pushing this repo
+
+Run `gitleaks git ~/.agents --no-banner --redact` and check that it reports no leaks. A finding confirmed as a false positive (a placeholder in vendored docs, a public key fingerprint) goes in `.gitleaksignore` by its fingerprint. `review-skills` (`check_skill.py --sensitive`) catches the values gitleaks doesn't look for: account IDs, emails, channel IDs and internal hostnames.
+
 ## Tools to install
 
 Required tools are needed by `install.sh` and the hooks. Recommended tools are used by many skills. Optional tools are used by one or two skills, which say so when the tool is missing. `bin/install.sh` checks all of them.
@@ -208,13 +212,13 @@ Required tools are needed by `install.sh` and the hooks. Recommended tools are u
 | jq | `setup-rtk.sh`, aws, auth0, security-review, vercel-troubleshooter | recommended | `brew install jq` |
 | uv | cartographer, review-skills, security-review, aws, autoresearch | recommended | `brew install uv` |
 | node | auth0, harness-architect, find-skills, npx-based steps | recommended | `brew install node` |
+| gitleaks | security-review, engineering-practices done checks, scanning this repo before a push | recommended | `brew install gitleaks`, or without installing: `docker run --rm -v "$PWD:/repo:ro" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact` |
 | claude | `retro-hook.py` worker, review-skills, create-skill evals | optional | https://docs.claude.com/en/docs/claude-code |
 | pnpm | pnpm, engineering-practices, security-review | optional | `brew install pnpm` |
 | graphviz (`dot`) | cartographer diagrams | optional | `brew install graphviz` |
 | agent-browser | agent-browser | optional | `brew install agent-browser` (the skill pins a version with `npm i -g agent-browser@<version>`) |
 | osv-scanner | security-review | optional | `brew install osv-scanner` |
 | zizmor | security-review | optional | `brew install zizmor` or `uvx zizmor` |
-| gitleaks | security-review | optional | `brew install gitleaks` |
 | pip-audit | security-review, code-modernization | optional | none, runs with `uvx pip-audit` |
 | codex | review-pr, cutting-agent-costs | optional | `brew install --cask codex` |
 | aws | aws, prod-evidence, security-review | optional | `brew install awscli` |
@@ -224,7 +228,7 @@ Required tools are needed by `install.sh` and the hooks. Recommended tools are u
 | yt-dlp, ffmpeg | watch-video | optional | `brew install yt-dlp ffmpeg` |
 | auth0 | auth0 | optional | `brew tap auth0/auth0-cli && brew install auth0` |
 | Stryker | typescript-practices (mutation testing, JS and TS) | optional, one-off, no install | `pnpm dlx` command in typescript-practices |
-| mutmut | python-practices (mutation testing, Python) | optional, one-off, no install | `uv run --with mutmut mutmut run` (python-practices) |
+| mutmut | python-practices (mutation testing, Python) | optional, one-off, no install | `uv run --with mutmut mutmut run`, or pip from a wheel cache in a one-off container (python-practices) |
 | Atlassian MCP | jira-workflow, triage, brag, why, reply-with-standing | optional | claude.ai connector or `claude mcp add` |
 | Slack MCP | triage, brag, why, reply-with-standing, self-improve | optional | claude.ai connector |
 | Sentry MCP | prod-evidence, self-improve, triage | optional | Sentry plugin or claude.ai connector |

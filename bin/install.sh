@@ -295,13 +295,13 @@ gh|gh|recommended|create-pr, review-pr, triage, why, jira-workflow, find-skills|
 jq|jq|recommended|setup-rtk.sh, aws, auth0, security-review, vercel-troubleshooter|https://jqlang.org/download/
 uv|uv|recommended|uvx scripts in cartographer, review-skills, security-review (pip-audit), aws, autoresearch|https://docs.astral.sh/uv/
 node|node|recommended|npx and pnpm based skills (auth0, harness-architect, find-skills)|https://nodejs.org
+gitleaks|gitleaks|recommended|secret scan in security-review, engineering-practices done checks and before pushing this repo|https://github.com/gitleaks/gitleaks
 claude|-|optional|bin/retro-hook.py worker (headless retro), review-skills, create-skill evals|https://docs.claude.com/en/docs/claude-code
 pnpm|pnpm|optional|pnpm, engineering-practices (Stryker), security-review|https://pnpm.io/installation
 dot|graphviz|optional|cartographer diagrams|https://graphviz.org/download/
 agent-browser|agent-browser|optional|agent-browser|npm i -g agent-browser@<version> (see the skill)
 osv-scanner|osv-scanner|optional|security-review (dependencies)|https://google.github.io/osv-scanner/
 zizmor|zizmor|optional|security-review (GitHub Actions)|uvx zizmor
-gitleaks|gitleaks|optional|security-review (secrets)|https://github.com/gitleaks/gitleaks
 codex|cask:codex|optional|review-pr and cutting-agent-costs cross-vendor checks|https://github.com/openai/codex
 aws|awscli|optional|aws, prod-evidence, security-review|https://aws.amazon.com/cli/
 sam|aws-sam-cli|optional|aws (serverless topics)|https://docs.aws.amazon.com/serverless-application-model/
