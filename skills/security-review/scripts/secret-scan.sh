@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Scans lines added between <base> and HEAD for high-signal secret patterns before the factory
-# pushes. Prints file:line and the pattern name, never the matched value, so logs stay clean.
+# Scans lines added between <base> and HEAD for high-signal secret patterns before a push,
+# when gitleaks isn't available (references/sinks-and-secrets.md). Prints file:line and the pattern name, never the matched value, so logs stay clean.
 #   secret-scan.sh <worktree> <base>     exit 0 clean, 1 possible secret, 2 bad input
 set -uo pipefail
 WT="${1:-}"; BASE="${2:-}"

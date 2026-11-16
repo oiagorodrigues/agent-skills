@@ -35,7 +35,7 @@ Patterns: `AKIA[0-9A-Z]{16}`, `-----BEGIN [A-Z ]*PRIVATE KEY`, `sk-[A-Za-z0-9_-]
   docker run --rm -v "$PWD:/repo:ro" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --no-banner --redact --log-opts="<base>..HEAD"
   ```
 
-  Drop `--log-opts` to scan the whole history, and use `dir /repo` instead of `git /repo` for files not yet committed. With gitleaks installed (`brew install gitleaks`), the same arguments work without `docker run`. `--redact` keeps the values out of the output. Each finding has a fingerprint; a confirmed false positive goes in the repo's `.gitleaksignore`, one fingerprint per line.
+  Drop `--log-opts` to scan the whole history, and use `dir /repo` instead of `git /repo` for files not yet committed. With gitleaks installed (`brew install gitleaks`), the same arguments work without `docker run`. `--redact` keeps the values out of the output. Each finding has a fingerprint; a confirmed false positive goes in the repo's `.gitleaksignore`, one fingerprint per line. Without gitleaks or Docker, `scripts/secret-scan.sh <worktree> <base>` checks the added lines for the high-signal patterns above.
 
 ## PII in logs and telemetry
 
