@@ -1,0 +1,112 @@
+# -*- coding: utf-8 -*-
+"""Export a self-contained HTML doc to PDF and/or Word (.docx).
+
+    python3 export_doc.py INPUT.html [--pdf out.pdf] [--docx out.docx] [--both]
+
+Works on BOTH docs this skill produces:
+  * Deployment architecture (static enough to export directly).
+  * User guide — export the *flat* build (`build_guide.py --flat`), not the interactive
+    single-page app, so every step is on the page for the printer/converter.
+
+PDF  ← headless Chrome/Chromium `--print-to-pdf` (best fidelity: keeps the CSS).
+      Falls back to `weasyprint` then `wkhtmltopdf` if no browser is found.
+DOCX ← `pandoc` (embeds the base64 images, including the SVG diagrams). If pandoc is missing it
+      prints install hints.
+
+Every backend is optional; the script reports what it used and what to install if none
+are available.
+"""
+import argparse, os, pathlib, shutil, subprocess, sys
+
+
+def _run(cmd):
+    # explicit utf-8: Windows would otherwise decode Chrome's --dump-dom with the ANSI codepage
+    try:
+        return subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+                              encoding="utf-8", errors="replace")
+    except OSError as e:  # on PATH but not runnable (wrong arch, no exec bit) — report, don't crash
+        return subprocess.CompletedProcess(cmd, 1, stdout=f"{cmd[0]}: {e}")
+
+
+def _file_url(path):
+    # "file://" + abspath gives file://C:\x on Windows, which Chrome rejects; as_uri() is portable
+    return pathlib.Path(path).resolve().as_uri()
+
+
+def find_chrome():
+    names = ["google-chrome", "google-chrome-stable", "chromium", "chromium-browser", "chrome",
+             "microsoft-edge", "brave-browser"]
+    for n in names:
+        p = shutil.which(n)
+        if p:
+            return p
+    for p in [  # common app paths
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+        "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+        "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+    ] + [  # Windows: browsers install outside PATH, under these default roots
+        os.path.join(base, *rel)
+        for base in (r"C:\Program Files", r"C:\Program Files (x86)",
+                     os.path.join(os.path.expanduser("~"), "AppData", "Local"))
+        for rel in (("Google", "Chrome", "Application", "chrome.exe"),
+                    ("Microsoft", "Edge", "Application", "msedge.exe"),
+                    ("BraveSoftware", "Brave-Browser", "Application", "brave.exe"),
+                    ("Chromium", "Application", "chrome.exe"))
+    ]:
+        if os.path.exists(p):
+            return p
+    return None
+
+
+def to_pdf(html, out):
+    src = _file_url(html)
+    chrome = find_chrome()
+    if chrome:
+        r = _run([chrome, "--headless=new", "--disable-gpu", "--no-sandbox",
+                  "--no-pdf-header-footer", f"--print-to-pdf={os.path.abspath(out)}", src])
+        if os.path.exists(out) and os.path.getsize(out) > 0:
+            return "chrome"
+        r = _run([chrome, "--headless", "--disable-gpu", "--no-sandbox",
+                  f"--print-to-pdf={os.path.abspath(out)}", src])  # older flag form
+        if os.path.exists(out) and os.path.getsize(out) > 0:
+            return "chrome(legacy)"
+        sys.stderr.write((r.stdout or "")[-400:] + "\n")
+    if shutil.which("weasyprint"):
+        _run(["weasyprint", html, out])
+        if os.path.exists(out):
+            return "weasyprint"
+    if shutil.which("wkhtmltopdf"):
+        _run(["wkhtmltopdf", "--enable-local-file-access", html, out])
+        if os.path.exists(out):
+            return "wkhtmltopdf"
+    return None
+
+
+def to_docx(html, out):
+    if not shutil.which("pandoc"):
+        return None
+    r = _run(["pandoc", html, "-f", "html", "-t", "docx", "-o", out])
+    if os.path.exists(out) and os.path.getsize(out) > 0:
+        return "pandoc"
+    sys.stderr.write((r.stdout or "")[-400:] + "\n")
+    return None
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("html")
+    ap.add_argument("--pdf")
+    ap.add_argument("--docx")
+    ap.add_argument("--both", action="store_true", help="write <name>.pdf and <name>.docx next to the input")
+    a = ap.parse_args()
+    base = os.path.splitext(a.html)[0]
+    pdf = a.pdf or (base + ".pdf" if (a.both or not a.docx) else None)
+    docx = a.docx or (base + ".docx" if (a.both or not a.pdf) else None)
+
+    if pdf:
+        used = to_pdf(a.html, pdf)
+        print(f"PDF  : {'OK via ' + used + ' -> ' + pdf if used else 'FAILED — install Chrome/Chromium, or weasyprint / wkhtmltopdf'}")
+    if docx:
+        used = to_docx(a.html, docx)
+        print(f"DOCX : {'OK via ' + used + ' -> ' + docx if used else 'FAILED — install pandoc (brew / apt / winget install pandoc)'}")
