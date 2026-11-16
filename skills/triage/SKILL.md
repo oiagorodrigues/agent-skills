@@ -85,7 +85,7 @@ Show the user, in the terminal:
 
 Posting is visible to other people, so wait for the user's go-ahead before posting, unless they already said to post. Then reply in the same place:
 
-- Slack: send it from Slack web in Chrome, as `reply-with-standing` describes (the connector's `slack_send_message` appends "Sent using @Claude"). Open the parent message's link, reply in its thread, not in the channel, and give the user the reply link. Without the browser tools, give the user the reply to paste.
+- Slack: send it from Slack web in Chrome, as `reply-with-standing` describes (the connector's `slack_send_message` appends "Sent using @Claude"). Open the parent message's link, reply in its thread, not in the channel, and give the user the reply link. If the browser can't do it, send it with `slack_send_message` and `thread_ts` set to the parent message, and say it went through the connector; in a Slack Connect channel, where the MCP can't post, give the user the reply to paste.
 - Jira: `addCommentToJiraIssue`.
 - GitHub: `gh issue comment <n> -R <org>/<repo> --body "<reply>"`.
 

@@ -214,7 +214,7 @@ Never send, post or schedule the message yourself unless the user says to. If th
 3. Click the composer (`find` "Message to <name>"), type the text, check it with `get_page_text` or a screenshot before pressing Enter.
 4. Check that the message shows in the conversation without a footer, close the tab and give the user the message link.
 
-If the browser tools aren't connected, create the message with `slack_send_message_draft` and give the user the link.
+If the browser can't do it (the tools aren't connected, Slack asks to sign in, the page doesn't respond), send it with the Slack MCP and tell the user it went through the connector, with the footer.
 
 ## Example
 
