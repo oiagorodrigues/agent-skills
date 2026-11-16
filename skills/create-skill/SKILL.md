@@ -14,6 +14,7 @@ Every skill on this machine lives in one place and is linked into each agent. Fo
 - To keep a skill out of some agent folders (for example where a project skill has the same name), list them in `~/.agents/skills/<name>/.link-skip`, one path relative to `$HOME` per line (`.claude-work/skills`); `link-skills.sh` skips them and removes an existing link there that points into `~/.agents/skills`.
 - Never edit anything under a `synced/` folder. Claude.ai account sync overwrites it. To change a synced skill, copy it to `~/.agents/skills/<new-name>` and edit the copy.
 - A project skill (`<repo>/.claude/skills/<name>/`) only when the user asks for one that ships with a repo. It's committed in that repo and not linked.
+- A rule, check, template or script that any agent could apply outside an automation goes in a global skill, never only inside the automation. An automation (the factory, an autopilot, a `claude -p` pipeline, a hook, a scheduled routine) reads it from that skill and keeps only what is about running itself: stage order, permissions, gates, caching and its own config. When you find a general rule living only inside an automation, move it to the skill that owns the topic and leave a pointer.
 
 ## Create
 
@@ -99,5 +100,6 @@ For eval tooling and description-trigger tuning, follow `~/.agents/skills/create
 - [ ] No dates, no mixed terms, no unexplained constants, forward-slash paths.
 - [ ] No sensitive or environment-specific values; each is read at run time or lives in a private skill, and `review-skills` shows no `sensitive` findings.
 - [ ] Added to the AGENTS.md required list if it must always load.
+- [ ] Nothing an agent could apply outside an automation lives only in the automation's files.
 - [ ] Tested on real prompts.
 - [ ] `review-skills` ran on the skill and shows no high findings.
