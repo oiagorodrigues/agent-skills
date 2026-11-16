@@ -12,7 +12,7 @@ Find vulnerabilities an attacker can reach in the code under review, prove each 
 - Report on what was asked: a diff, a PR, named files or a feature. Research the whole repo (callers, base classes, settings, middleware, other services) before calling anything a finding.
 - A pre-release pass reviews the diff from the last release tag to the release branch, plus every dependency and config change in it.
 - A full-repository audit is a different job. Use the `security-audit` skill (Cloudflare's multi-phase workflow). In full audit mode it writes its run files to `~/security-audit-skill/<repo>/run-<N>` unless the user names another directory outside the repo.
-- Inside `review-pr`'s security lane, run steps 1, 3, 4 (only when a manifest or lockfile changed) and 5, and hand findings back in that skill's format.
+- Inside `review-pr`'s security lane, run steps 1, 2 (only when the diff adds an entry point), 3, 4 (only when a manifest or lockfile changed) and 5, and hand findings back in that skill's format.
 
 ## Workflow
 
