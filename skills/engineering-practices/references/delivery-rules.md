@@ -8,6 +8,7 @@ Read this when a rule in the "How to work", "Feature flags and config" or "Commi
 2. Tidy first, as its own PR
 3. Roll out risky changes to a slice first
 4. Write an ADR only when it earns one
+5. Landing, watching prod and cleaning up
 
 ## 1. Tracer bullet: one thin path end to end first
 
@@ -115,3 +116,33 @@ Consequences: every boundary converts; existing decimal columns need a migration
 ```
 
 Source: Matt Pocock's domain-modeling skill (MIT, https://github.com/mattpocock/skills), on when a decision deserves an ADR.
+
+## 5. Landing, watching prod and cleaning up
+
+These hold for any agent that takes a change past review, by hand or in an automation. The workspace skill, when one exists, holds the company's values: how each repo lands, the deploy workflows, the channels to check and the alert sources.
+
+Landing:
+
+- Merge only when the user asks you to land that PR (`~/.agents/AGENTS.md`, "Local work"). Never force it: no `gh pr merge --admin`, no bypass of branch protection, no direct push to the trunk.
+- Land the way the repo requires. Read its branch rules (`gh api repos/<org>/<repo>/rules/branches/<trunk>`: a `merge_queue` rule means `gh pr merge --auto`) and look for an `atlantis.yaml` (then comment the apply after approval and let Atlantis merge). If you can't tell, stop and ask.
+- Before the PR enters a queue and again before a prod deploy, read the deploy and incident channels, and wait when there is an incident or someone is holding deploys.
+- Waiting for approvals, CI, a queue or a deploy is polling `gh` or the deploy tool, not a model reading the same page again.
+- A failure you didn't cause (another PR in the same queue group, a flaky test, a broken trunk after the merge) stops the work and gets reported, because fixing forward or reverting the trunk is a team decision.
+
+Watching prod after a deploy:
+
+- Watch for 30 to 60 minutes after the deploy finishes, longer for a path that runs rarely, with checks spread over the window (for example at 10, 30 and 60 minutes).
+- Look at the error tracker (new issues first seen in the deployed release, issues whose rate went up against the hour before), metrics and APM (error rate and latency of the changed endpoints or pages against the hour before, monitors in alert), alert channels, and the channels where people report bugs. `prod-evidence` holds the queries and the two-source rule.
+- Count a problem as caused by the deploy only when it touches the changed code or starts after the deploy time. Report what you checked, each number with its query and window, and the links.
+- A regression gets a fix branch from the trunk that links the original ticket and PR, through the same review. A severe incident gets reported at once instead of waiting for the fix; a revert is the user's decision.
+
+Cleaning up, only after every PR of the ticket is in prod and the watch found nothing caused by the deploy:
+
+1. Remove the test data, accounts and permissions you added on staging, and release any impersonation.
+2. Stop the dev servers and background tasks you started, remove the ticket's worktrees (check `git status` is clean first) and delete the merged branches locally and on the remote.
+3. Delete the ticket's watch jobs and the session's scratch files.
+4. Move the ticket to Done and say which checks of the watch it rests on. If the watch found something, report it and leave the ticket open.
+
+Bad: the PR merged, so the ticket closes, and the branch and the staging test account stay forever.
+
+Good: the ticket closes after a clean 60-minute watch, with the queries behind "no new errors" in the report, and nothing the work created is left behind.
