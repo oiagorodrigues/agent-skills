@@ -207,7 +207,14 @@ Rules:
 - When the user's own draft was already good, say what they did right and why it works, so they keep doing it.
 - Be direct and specific, never preachy. Talk about the effect on the reader, not about the user's character.
 
-Never send, post or schedule the message yourself unless the user says to. If they do, read the channel topic first (Slack MCP rule) and confirm the exact text.
+Never send, post or schedule the message yourself unless the user says to. If they do, read the channel topic first (Slack MCP rule) and confirm the exact text. Never send through the Slack connector: `slack_send_message` appends "Sent using @Claude", and the connector can't edit or delete the message afterward. Send it from Slack web in Chrome with the claude-in-chrome tools instead, where it goes out as the user with no footer:
+
+1. Get the conversation id (`slack_search_users` gives the user id, and `slack_read_channel` with it shows the `D...` DM id) and the team id (the `T...` in any Slack bot address or channel link).
+2. Open a new tab at `https://app.slack.com/client/<team id>/<conversation id>`. If Slack shows a sign-in page, stop and ask the user to sign in.
+3. Click the composer (`find` "Message to <name>"), type the text, check it with `get_page_text` or a screenshot before pressing Enter.
+4. Check that the message shows in the conversation without a footer, close the tab and give the user the message link.
+
+If the browser tools aren't connected, create the message with `slack_send_message_draft` and give the user the link.
 
 ## Example
 
