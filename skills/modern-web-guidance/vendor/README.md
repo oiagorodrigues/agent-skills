@@ -11,6 +11,8 @@
 
 Unchanged files from the tarball: `package.json`, `LICENSE`, `THIRD_PARTY_NOTICES`, and `skills/modern-web-guidance/` (CLI, search bundle, guides, vectors, MiniLM model, watchdog). Left out: both `SKILL.md` files (the text lives in `topics/`, and a nested `SKILL.md` could register as a second skill), `search.mjs.map`, `skills/chrome-extensions/` (already in `topics/chrome-extensions/`), the upstream `README.md`, plugin manifests, `.github/`, `assets/` and `policies/`. No source is patched. The package has no npm dependencies; everything is bundled.
 
+Only the built files the GitHub repos don't hold are committed here: `THIRD_PARTY_NOTICES`, `modern-web.mjs`, `search.mjs`, `guides.json`, `use-cases.vectors.gen.json.gz`, `skill-version.txt` and `watchdog/main.js`. `bin/fetch-third-party.sh` installs the rest (`LICENSE`, both `package.json` files, `guides/` and `tfjs-model-minilm/`) at the commits in `~/.agents/third-party.tsv`, which are tag `v0.0.197` of `GoogleChrome/modern-web-guidance` and `GoogleChrome/modern-web-guidance-src` and hold the same bytes as the tarball.
+
 ## Network calls in the package and how they stay off
 
 - Telemetry: `skills/modern-web-guidance/watchdog/main.js:13` (endpoint `https://play.googleapis.com/log`) and `:74` (`fetch`). The CLI starts that process from `modern-web.mjs:312` only when `ClearcutLogger` is enabled (`modern-web.mjs:382-391`, `:413-421`). `scripts/mwg` sets `DISABLE_TELEMETRY=1`, so the process is never started.
@@ -22,6 +24,6 @@ Unchanged files from the tarball: `package.json`, `LICENSE`, `THIRD_PARTY_NOTICE
 
 1. `npm pack modern-web-guidance@<version>` into an empty scratch folder, check the integrity against `npm view modern-web-guidance@<version> dist`, and extract it.
 2. Re-read `modern-web.mjs`, `watchdog/main.js` and the model loader in `search.mjs` for new network calls.
-3. Replace `modern-web-guidance/` with the same file set as above and update this file.
+3. Replace the committed built files above, move the commits in `third-party.tsv` to the new version's tags, run `bin/fetch-third-party.sh`, and update this file.
 4. Refresh `topics/modern-web-guidance/README.md` from the new `skills/modern-web-guidance/SKILL.md`, keeping the `scripts/mwg` commands.
 5. Re-run the offline check: `sandbox-exec -p '(version 1)(allow default)(deny network* (with send-signal SIGKILL))' ~/.agents/skills/modern-web-guidance/scripts/mwg search "light dismiss dialog"` must exit 0 with results.

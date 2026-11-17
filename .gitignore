@@ -31,3 +31,17 @@ node_modules/
 *.swp
 .idea/
 .vscode/
+
+# Third-party files that bin/fetch-third-party.sh (run by bin/install.sh) installs from third-party.tsv,
+# and its record of what it installed.
+.third-party-state/
+/skills/caveman/
+/skills/caveman-commit/
+/skills/caveman-compress/
+/skills/caveman-help/
+/skills/caveman-review/
+/skills/modern-web-guidance/vendor/modern-web-guidance/LICENSE
+/skills/modern-web-guidance/vendor/modern-web-guidance/package.json
+/skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/guides/
+/skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/package.json
+/skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/tfjs-model-minilm/
