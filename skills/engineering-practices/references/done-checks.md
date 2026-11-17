@@ -9,3 +9,4 @@ Each line is a mistake a person caught after an agent called the work done, adde
 - No comment or docstring restates the code ("Comments and docstrings" in `SKILL.md`) · read the added comment lines in the diff
 - No file changed outside the plan's "Files to change", or the reason is in the PR notes · `~/.agents/skills/review-pr/scripts/review-bundle.sh` lists them under "Out of plan"
 - No secret in the lines the branch adds · gitleaks over `<base>..HEAD` (`~/.agents/skills/security-review/references/sinks-and-secrets.md`), or `~/.agents/skills/security-review/scripts/secret-scan.sh` when gitleaks isn't available
+- Every user-visible feature of the version being replaced or sped up still works, or its removal has the user's yes and the report calls it a scope cut · list the old version's features and check each on the new one
