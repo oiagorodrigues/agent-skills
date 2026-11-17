@@ -523,6 +523,12 @@ def private_skill_names() -> set[str]:
         except (OSError, UnicodeDecodeError):
             continue
         names.update(re.findall(r"(?m)^/?skills/([\w.-]+)/?\s*$", text))
+    # Folders bin/fetch-third-party.sh installs from upstream are ignored too, but they aren't private.
+    try:
+        manifest = (SKILLS_ROOT.parent / "third-party.tsv").read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        manifest = ""
+    names -= set(re.findall(r"(?m)^skills/([\w.-]+)\t", manifest))
     return names
 
 
