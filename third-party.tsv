@@ -1,0 +1,17 @@
+# Third-party files bin/fetch-third-party.sh installs from upstream; .gitignore keeps them out of this repo.
+# Tab-separated: local path, upstream git URL, pinned commit, path inside upstream, license.
+# caveman: the commit .skill-lock.json recorded at install time (each skillFolderHash is that commit's tree for the path).
+skills/caveman	https://github.com/JuliusBrussee/caveman.git	63e797cd753b301374947a5ed975c21775d962b9	caveman	MIT
+skills/caveman-commit	https://github.com/JuliusBrussee/caveman.git	63e797cd753b301374947a5ed975c21775d962b9	skills/caveman-commit	MIT
+skills/caveman-compress	https://github.com/JuliusBrussee/caveman.git	63e797cd753b301374947a5ed975c21775d962b9	caveman-compress	MIT
+skills/caveman-help	https://github.com/JuliusBrussee/caveman.git	63e797cd753b301374947a5ed975c21775d962b9	skills/caveman-help	MIT
+skills/caveman-review	https://github.com/JuliusBrussee/caveman.git	63e797cd753b301374947a5ed975c21775d962b9	skills/caveman-review	MIT
+# modern-web-guidance 0.0.197: tag v0.0.197 in both repos. The built CLI files only ship in the npm package, so they stay committed (see skills/modern-web-guidance/vendor/README.md).
+skills/modern-web-guidance/vendor/modern-web-guidance/LICENSE	https://github.com/GoogleChrome/modern-web-guidance.git	341268561baaff256927c931ec8215dbd30e3cee	LICENSE	Apache-2.0
+skills/modern-web-guidance/vendor/modern-web-guidance/package.json	https://github.com/GoogleChrome/modern-web-guidance.git	341268561baaff256927c931ec8215dbd30e3cee	package.json	Apache-2.0
+skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/guides	https://github.com/GoogleChrome/modern-web-guidance.git	341268561baaff256927c931ec8215dbd30e3cee	skills/modern-web-guidance/guides	Apache-2.0
+skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/package.json	https://github.com/GoogleChrome/modern-web-guidance-src.git	20a8ec7bf4ca581ccc4753fb75ab1448f9ac8800	src/cli/template/skills/modern-web-guidance/package.json	Apache-2.0
+skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/tfjs-model-minilm/group1-shard1of1.bin	https://github.com/GoogleChrome/modern-web-guidance-src.git	20a8ec7bf4ca581ccc4753fb75ab1448f9ac8800	src/rag/tfjs-model-minilm/group1-shard1of1.bin	Apache-2.0
+skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/tfjs-model-minilm/model.json	https://github.com/GoogleChrome/modern-web-guidance-src.git	20a8ec7bf4ca581ccc4753fb75ab1448f9ac8800	src/rag/tfjs-model-minilm/model.json	Apache-2.0
+skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/tfjs-model-minilm/tokenizer.json.gz	https://github.com/GoogleChrome/modern-web-guidance-src.git	20a8ec7bf4ca581ccc4753fb75ab1448f9ac8800	src/rag/tfjs-model-minilm/tokenizer.json.gz	Apache-2.0
+skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/tfjs-model-minilm/tokenizer_config.json	https://github.com/GoogleChrome/modern-web-guidance-src.git	20a8ec7bf4ca581ccc4753fb75ab1448f9ac8800	src/rag/tfjs-model-minilm/tokenizer_config.json	Apache-2.0

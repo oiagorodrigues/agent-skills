@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Puts this repo at ~/.agents and sets it up: checks tools, points every installed agent at AGENTS.md,
-# links the skills and, when asked, adds the retro hooks to Claude Code and the RTK hooks.
-# Safe to re-run. It never overwrites or deletes a file in ~/.agents, and every agent config file
-# it changes gets a timestamped backup first.
+# installs the third-party skills in third-party.tsv, links the skills and, when asked, adds the retro
+# hooks to Claude Code and the RTK hooks.
+# Safe to re-run. It never overwrites or deletes a file in ~/.agents (except, under --yes, a third-party
+# path from third-party.tsv that has local edits), and every agent config file it changes gets a
+# timestamped backup first.
 set -u
 
 usage() {
@@ -15,10 +17,12 @@ Run it from a clone of the repo, anywhere. It first puts the repo at ~/.agents:
   ~/.agents is anything else         lists what differs and asks before merging. A merge adds only
                                      the missing files, keeps every local file as it is and makes
                                      ~/.agents a checkout of the repo, so git status shows the differences.
-Then it checks tools, writes the AGENTS.md pointers and links the skills.
+Then it checks tools, writes the AGENTS.md pointers, installs the third-party files listed in
+third-party.tsv at their pinned commits (bin/fetch-third-party.sh, also runnable alone) and links the skills.
 
   --dry-run          Print what would change and change nothing.
-  --yes, -y          Answer yes to the pull and merge questions.
+  --yes, -y          Answer yes to the pull and merge questions, and let bin/fetch-third-party.sh
+                     replace third-party folders that have local changes.
   --install-tools    Install missing required and recommended tools with Homebrew.
   --all-tools        With --install-tools, also install the optional tools.
   --hooks            Add the retro SessionStart/SessionEnd hooks to each Claude Code profile's settings.json.
@@ -418,6 +422,15 @@ if [ -d "$HOME/.cursor" ]; then
   say "           $POINTER_SENTENCE"
 fi
 [ "$found_agent" = 0 ] && say "  No agent config folders found. Install an agent, start it once, then re-run this script."
+
+# --- Third-party skills -----------------------------------------------------
+# Before linking, so the installed skill folders get linked too.
+section "Third-party skills"
+tp_args=""
+[ "$DRY_RUN" = 1 ] && tp_args="$tp_args --dry-run"
+[ "$YES" = 1 ] && tp_args="$tp_args --yes"
+# shellcheck disable=SC2086 # tp_args holds only fixed flags
+bash "$AGENTS_DIR/bin/fetch-third-party.sh" $tp_args || warn "bin/fetch-third-party.sh didn't install everything; see above"
 
 # --- Skills -----------------------------------------------------------------
 section "Skills"
