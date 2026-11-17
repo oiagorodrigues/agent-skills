@@ -27,7 +27,14 @@ Load these skills every time their trigger applies, before you start that part o
 - `correct`: the user corrects the same kind of mistake a second time, says "you keep doing X" or "make this impossible", or a retro or debugging finds a mistake class a check could catch. It turns the mistake into a check that fails, before any prose rule.
 - `why`: before you delete or loosen a guard, rule, threshold or odd-looking piece of code whose reason you don't know, and when the user asks why something is the way it is. It answers from git history, PRs, tickets and conversations, with citations.
 
-The caveman skills only change how terse your chat replies to the user are. Anything another person reads in the user's name keeps the user's voice and follows `reply-with-standing`, `create-pr` and `plain-writing`, even while caveman mode is on.
+## Caveman mode
+
+The caveman skills come unmodified from upstream (`bin/fetch-third-party.sh`), so these rules sit here and win over them. Caveman terseness covers only your chat replies to the user and your own working notes. Anything another person reads in the user's name keeps the user's voice, even while caveman mode is on:
+
+- Slack messages and DMs, emails, Jira and Confluence comments, and PR comments follow `reply-with-standing`. PR descriptions follow `create-pr`. Docs and any other published prose follow `plain-writing`, including its author's voice section.
+- Commit messages (`caveman-commit`): the repo's commit conventions and `plain-writing` win, and the workspace skill, when one exists, holds the commit limits. A terse subject is fine only while it reads as plain English; write the body in full, connected sentences.
+- `caveman-review` one-liners are for review findings shown to the user in chat. Comments posted on a PR follow `review-pr` and `reply-with-standing`, and `review-pr`'s format wins when it runs the review.
+- `caveman-compress`: never compress a file that holds the user's voice or instructions other agents follow exactly (AGENTS.md, CLAUDE.md, any SKILL.md, memory files) unless the user names that file, and leave prose other people read in the user's name alone.
 
 ## Command output (RTK)
 
