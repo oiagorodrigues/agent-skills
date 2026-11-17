@@ -23,7 +23,7 @@ One set of rules and skills for every coding agent on the machine: Claude Code, 
 The skills, the hooks and `link-skills.sh` all read `~/.agents`, so the repo always ends up at that path. Clone it anywhere and run its installer, which puts it there:
 
 ```sh
-git clone https://github.com/<owner>/<repo>.git /tmp/agents-src
+git clone https://github.com/<owner>/agent-skills.git /tmp/agents-src
 /tmp/agents-src/bin/install.sh --dry-run    # see what it would do
 /tmp/agents-src/bin/install.sh              # place ~/.agents, pointers, skill links
 ~/.agents/bin/install.sh --hooks --rtk
@@ -32,11 +32,11 @@ git clone https://github.com/<owner>/<repo>.git /tmp/agents-src
 Or run it in one line without a clone. The script clones `AGENTS_REPO_URL` to a temp folder, runs from there and deletes the temp folder when it finishes:
 
 ```sh
-AGENTS_REPO_URL=https://github.com/<owner>/<repo>.git \
-  bash -c "$(curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/bin/install.sh)"
+AGENTS_REPO_URL=https://github.com/<owner>/agent-skills.git \
+  bash -c "$(curl -fsSL https://raw.githubusercontent.com/<owner>/agent-skills/main/bin/install.sh)"
 ```
 
-The repo isn't published yet, so `<owner>/<repo>` is a placeholder; replace it with the real GitHub owner and repo name once it is. Run from a clone, the script takes the URL from the clone's `origin`, and `AGENTS_REPO_URL` overrides it.
+The repo is `agent-skills`; it isn't published yet, so replace `<owner>` with the GitHub owner once it is. Run from a clone, the script takes the URL from the clone's `origin`, and `AGENTS_REPO_URL` overrides it.
 
 What happens to `~/.agents` depends on what is already there:
 
@@ -66,7 +66,7 @@ Company-only workspace skills stay in `~/.agents` on the machine that has them a
 
 ### Installing with `npx skills`
 
-The skills follow the `skills/<name>/SKILL.md` layout that the skills CLI reads (`.skill-lock.json` records the same `skillPath` shape for skills installed from other repos), so `npx skills add <owner>/<repo>` can pick skills from this repo. It copies only the skills, though, without `AGENTS.md`, the pointers or the hooks, and many skills read files under `~/.agents`, so use `bin/install.sh` for the full setup.
+The skills follow the `skills/<name>/SKILL.md` layout that the skills CLI reads (`.skill-lock.json` records the same `skillPath` shape for skills installed from other repos), so `npx skills add <owner>/agent-skills` can pick skills from this repo. It copies only the skills, though, without `AGENTS.md`, the pointers or the hooks, and many skills read files under `~/.agents`, so use `bin/install.sh` for the full setup.
 
 ## How the pointers work
 
