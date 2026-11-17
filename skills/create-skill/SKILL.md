@@ -20,7 +20,7 @@ Every skill on this machine lives in one place and is linked into each agent. Fo
 
 1. Check that no skill already covers the topic, with the grep under "Edit"; if one does, extend it instead. Then pick the name (rules below) and check it's free: `ls ~/.agents/skills/<name>` and `ls ~/.claude/skills ~/.claude-*/skills | grep <name>`.
 2. Write `~/.agents/skills/<name>/SKILL.md`.
-3. Run `~/.agents/bin/link-skills.sh`. It removes broken links and links every skill that has a `SKILL.md` into each agent folder that exists. Codex reads `~/.agents/skills` directly and needs no link.
+3. If the user says which agents or profiles get the skill, first list every other agent folder in `~/.agents/skills/<name>/.link-skip` (see "Where skills go"). Then run `~/.agents/bin/link-skills.sh`. It removes broken links and links every skill that has a `SKILL.md` into each agent folder that exists. Codex reads `~/.agents/skills` directly and needs no link.
 4. Check the links: `ls -l ~/.claude/skills/<name> ~/.claude-*/skills/<name>` must show `-> .../.agents/skills/<name>`. A skill with a `.link-skip` file has no link in the folders it lists, by design.
 5. If the skill doesn't show up in the Claude Code skill list, run `/reload-skills`.
 6. If the skill must load every time a trigger applies (not just when the model picks it), add it to the required list under "Skills" in `~/.agents/AGENTS.md`, with the trigger written the same way as the other entries.
