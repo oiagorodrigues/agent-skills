@@ -8,7 +8,9 @@ One set of rules and skills for every coding agent on the machine: Claude Code, 
 | --- | --- |
 | `AGENTS.md` | Global rules for every agent. Each agent's global instructions file imports or links it. |
 | `skills/` | The skills, one folder each with a `SKILL.md`. This folder is the source of truth; agents get symlinks to it. |
-| `bin/install.sh` | Puts the repo at `~/.agents` and sets up a machine: checks tools, writes the `AGENTS.md` pointers, links the skills, and adds hooks when asked. |
+| `bin/install.sh` | Puts the repo at `~/.agents` and sets up a machine: checks tools, writes the `AGENTS.md` pointers, installs the third-party skills, links the skills, and adds hooks when asked. |
+| `bin/fetch-third-party.sh` | Installs the files listed in `third-party.tsv` from upstream at their pinned commits. `install.sh` runs it. |
+| `third-party.tsv` | Third-party skill files that aren't committed here, each with its upstream repo, pinned commit and license. |
 | `bin/link-skills.sh` | Links every skill into each agent's skills folder and removes broken links. A skill can stay out of an agent with a `.link-skip` file. |
 | `bin/setup-rtk.sh` | Installs or repairs the RTK command-output hooks in every agent that supports them. |
 | `bin/retro-hook.py` | Claude Code SessionStart and SessionEnd hook that runs the `retro` skill on ended sessions and writes to `retros/`. |
@@ -240,6 +242,10 @@ Required tools are needed by `install.sh` and the hooks. Recommended tools are u
 
 These skills are copies or adaptations of other people's work. Each keeps its license file where the source shipped one.
 
+The ones used as upstream ships them aren't committed here. `third-party.tsv` lists each of their paths with the upstream git URL, the pinned commit, the path inside that repo and the license, and `.gitignore` keeps those paths out of the repo. `bin/install.sh` installs them by running `bin/fetch-third-party.sh`, which you can also run alone with `--dry-run` or `--yes`. For each line it clones the repo without file contents (`git clone --filter=blob:none --no-checkout`), checks that the pinned commit resolves to the same SHA, fetches only the blobs under that path and copies the path into place. It never runs anything from the download. It records each install in `.third-party-state/` and skips a path that still matches its record. When a path's files differ from both its record and the pinned commit, it lists the files that differ and leaves the path alone unless you pass `--yes`.
+
+Put local rules for these skills in `AGENTS.md`, because an edited copy blocks the next install. To move to a newer upstream version, change the commit in `third-party.tsv` and re-run `bin/fetch-third-party.sh`. The built CLI files of modern-web-guidance (`modern-web.mjs`, `search.mjs`, the guide index and the search vectors) ship only in the npm package, so they stay committed in `vendor/`, while its guides and MiniLM model come from GitHub.
+
 | Skill | Source | License |
 | --- | --- | --- |
 | 10x-team | 10x-Team Claude Code plugin by Md Rizabul | MIT (`LICENSE`) |
@@ -253,7 +259,7 @@ These skills are copies or adaptations of other people's work. Each keeps its li
 | brainstorming | obra/superpowers by Jesse Vincent, via claude-code-templates | MIT (`LICENSE`) |
 | business-requirements-analyst | github.com/gmdaos | MIT (frontmatter) |
 | cartographer | Roei Michael | MIT (`LICENSE`) |
-| caveman, caveman-commit, caveman-compress, caveman-help, caveman-review | https://github.com/JuliusBrussee/caveman (in `.skill-lock.json`) | see upstream; no license file here |
+| caveman, caveman-commit, caveman-compress, caveman-help, caveman-review | https://github.com/JuliusBrussee/caveman, installed from `third-party.tsv` | MIT (upstream `LICENSE`) |
 | code-modernization | Anthropic code-modernization plugin | Apache-2.0 (`LICENSE`) |
 | code-simplifier | Anthropic code-simplifier agent | Apache-2.0 (`LICENSE`) |
 | correct, why | Lauren Tan's pstack, https://github.com/cursor/plugins/tree/main/pstack | MIT |
@@ -268,7 +274,7 @@ These skills are copies or adaptations of other people's work. Each keeps its li
 | interactive-docs | interactive-docs plugin by Bhargava Ganti | MIT (`LICENSE`) |
 | review-pr, retro, plain-writing | adapted in part from pstack (Lauren Tan), Matt Pocock's skills and blader/humanizer | MIT |
 | plain-writing | Wikipedia "Signs of AI writing" | CC BY-SA 4.0 for any text taken from Wikipedia |
-| modern-web-guidance | Google Chrome modern-web-guidance plugin | Apache-2.0 (`LICENSE`, `vendor/.../THIRD_PARTY_NOTICES`) |
+| modern-web-guidance | Google Chrome modern-web-guidance plugin 0.0.197, partly installed from `third-party.tsv` | Apache-2.0 (`LICENSE`, `vendor/.../THIRD_PARTY_NOTICES`) |
 | pnpm, vitest | Anthony Fu, https://github.com/antfu/skills | see upstream |
 | review-skills (`scripts/scan_skill.py`) | Sentry skill-scanner, https://github.com/getsentry/skills | Apache-2.0 (`NOTICE`, `scripts/LICENSE-scan_skill`) |
 | security-audit | Cloudflare | MIT (`LICENSE`) |
