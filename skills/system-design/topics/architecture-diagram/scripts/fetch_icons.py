@@ -63,6 +63,9 @@ FAMILIES = {
                      "https://cdn.jsdelivr.net/npm/@tabler/icons@{version}/icons/outline/{name}.svg"),
     "simple-icons": Family("16.36.0", "fill",
                            "https://cdn.jsdelivr.net/npm/simple-icons@{version}/icons/{name}.svg"),
+    # gilbarbara/logos publishes no tags or npm package, so the version is a commit.
+    "logos": Family("b9edc65f8946027cb5e2fe6c772e914cf3649fba", "color",
+                    "https://cdn.jsdelivr.net/gh/gilbarbara/logos@{version}/logos/{name}.svg"),
     "aws": Family("07312026", "color",
                   "https://d1.awsstatic.com/onedam/marketing-channels/website/public/shared/"
                   "architecture-icon-release/Icon-package_07312026.5846e92413caa21490223536cc97f1269e44fa92.zip",

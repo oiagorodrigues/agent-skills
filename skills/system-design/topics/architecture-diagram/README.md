@@ -138,15 +138,17 @@ family without a catalog entry.
 - `simple-icons`: vendor logos by Simple Icons slug, drawn white on the kind
   tile, such as `stripe`, `auth0`, `datadog`, `sentry`, `postgresql`, `redis`,
   `apachekafka`, `docker`, `kubernetes`, `github`, `cloudflare`.
+- `logos`: full-color logos from gilbarbara/logos for vendors Simple Icons
+  lacks: `openai`, `salesforce`, `sendgrid`, `slack`, `twilio`.
 - `lucide` (and `tabler` for `bucket`): line glyphs drawn white on the kind
   tile, such as `user`, `users`, `browser`, `mobile`, `server`, `database`,
   `cache`, `queue`, `stream`, `cdn`, `load-balancer`, `dns`, `gateway`,
   `lambda`, `container`, `scheduler`, `email`, `webhook`, `lock`, `key`,
   `shield`, `monitoring`, `logs`, `bot`.
 
-Full-color icons (AWS, Azure, Google Cloud) replace the kind tile and keep their
-own colors; the box border and edges still follow the kind. One-color glyphs sit
-white on the tile.
+Full-color icons (AWS, Azure, Google Cloud, `logos`) replace the kind tile and
+keep their own colors; the box border and edges still follow the kind. One-color
+glyphs sit white on the tile.
 
 `scripts/fetch_icons.py` does the fetching; the renderer calls it for every icon
 the spec uses.

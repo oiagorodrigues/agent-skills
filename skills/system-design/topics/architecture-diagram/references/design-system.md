@@ -9,7 +9,7 @@ changing the script; to draw a diagram, the README is enough.
   in the kind color on the left, a white 26px icon on the tile, and the label in
   14px semibold system sans-serif (`-apple-system, BlinkMacSystemFont, 'Segoe UI',
   Helvetica, Arial, sans-serif`). Labels wrap to two lines, or three at 12px.
-  A full-color vendor icon (AWS, Azure, Google Cloud) takes the tile's place at
+  A full-color vendor icon (AWS, Azure, Google Cloud, `logos`) takes the tile's place at
   40px with its own colors; Azure's terms ask for icons as they appear in Azure.
   An icon that couldn't be fetched leaves the tile empty.
 - Group frames: a rounded rectangle in the group's kind color with a 5% tint fill
