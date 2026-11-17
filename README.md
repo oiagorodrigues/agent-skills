@@ -60,7 +60,7 @@ Install and start each agent once before running it, because the script only set
 
 ### Private skills and files
 
-Company-only workspace skills, and other private material, stay in `~/.agents` on the machine that has them and are listed in `.gitignore`, so they never reach the repo. `link-skills.sh` still links an ignored skill like any other. The ignored paths include the private skill folders, `/agents/` (a private study), `/retros/` and `factory/config.json`, the working factory config; `factory/config.example.json` holds the same structure with placeholder values. To keep another skill private, add its folder to `.gitignore`.
+Company-only workspace skills stay in `~/.agents` on the machine that has them and are listed in that clone's `.git/info/exclude`, which git never commits, so their names don't reach the repo either. Do the same for a `.link-skip` file that names local profile folders. `link-skills.sh` still links an excluded skill like any other. `.gitignore` keeps out what every machine generates: `/retros/`, `factory/config.json` (the working factory config; `factory/config.example.json` holds the same structure with placeholder values) and `/agents/`. To keep another skill private, add `skills/<name>/` to `.git/info/exclude`.
 
 ### Installing with `npx skills`
 
