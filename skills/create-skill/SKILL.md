@@ -71,7 +71,7 @@ These come from Anthropic's skill authoring best practices (https://platform.cla
 - Use forward slashes in paths and descriptive file names (`form_validation_rules.md`, not `doc2.md`).
 - Name MCP tools with their server (`Atlassian:getJiraIssue`), so the model finds them when several servers are connected.
 - Write the prose with the `plain-writing` skill.
-- Keep sensitive and environment-specific values out of the skill: AWS account IDs and profile names, emails, Slack channel and user IDs, internal hostnames, tokens, people's names and private company details. The skill reads them at run time from the environment, the session, `~/.zshrc`, `aws configure list-profiles`, `git config`, or a private workspace skill that `~/.agents/.gitignore` keeps out of the repo, and names only where to look.
+- Keep sensitive and environment-specific values out of the skill: AWS account IDs and profile names, emails, Slack channel and user IDs, internal hostnames, tokens, people's names and private company details. The skill reads them at run time from the environment, the session, `~/.zshrc`, `aws configure list-profiles`, `git config`, or a private workspace skill that the local `~/.agents/.git/info/exclude` keeps out of the repo, and names only where to look.
 
 ## Scripts
 

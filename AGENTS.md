@@ -47,7 +47,7 @@ Verify every fact before you state it, in every kind of output: chat answers, re
 
 ## Sensitive values
 
-Skills, AGENTS.md, scripts and any file they read never hold account IDs, emails, profile names, channel or user IDs, internal hostnames, tokens or people's names. Read them at run time from the environment, the session, the shell profile, `git config` or the tool itself (`aws configure list-profiles`), or keep them in a private workspace skill that `.gitignore` keeps out of the repo.
+Skills, AGENTS.md, scripts and any file they read never hold account IDs, emails, profile names, channel or user IDs, internal hostnames, tokens or people's names. Read them at run time from the environment, the session, the shell profile, `git config` or the tool itself (`aws configure list-profiles`), or keep them in a private workspace skill that the local `.git/info/exclude` keeps out of the repo.
 
 ## Production access
 
