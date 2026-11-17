@@ -515,12 +515,15 @@ def check_references(skill_dir: Path, md_files: dict[Path, str], skill_names: se
 
 
 def private_skill_names() -> set[str]:
-    """Skills ~/.agents/.gitignore keeps out of the repo; they are where private values belong."""
-    try:
-        text = (SKILLS_ROOT.parent / ".gitignore").read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
-        return set()
-    return set(re.findall(r"(?m)^/?skills/([\w.-]+)/?\s*$", text))
+    """Skills ~/.agents/.gitignore or the local .git/info/exclude keep out of the repo; private values belong there."""
+    names: set[str] = set()
+    for ignore_file in (SKILLS_ROOT.parent / ".gitignore", SKILLS_ROOT.parent / ".git" / "info" / "exclude"):
+        try:
+            text = ignore_file.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        names.update(re.findall(r"(?m)^/?skills/([\w.-]+)/?\s*$", text))
+    return names
 
 
 def check_skill(skill_dir: Path, domains: set[str], private: set[str]) -> dict[str, Any]:
