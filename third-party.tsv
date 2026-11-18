@@ -15,3 +15,9 @@ skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance
 skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/tfjs-model-minilm/model.json	https://github.com/GoogleChrome/modern-web-guidance-src.git	20a8ec7bf4ca581ccc4753fb75ab1448f9ac8800	src/rag/tfjs-model-minilm/model.json	Apache-2.0
 skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/tfjs-model-minilm/tokenizer.json.gz	https://github.com/GoogleChrome/modern-web-guidance-src.git	20a8ec7bf4ca581ccc4753fb75ab1448f9ac8800	src/rag/tfjs-model-minilm/tokenizer.json.gz	Apache-2.0
 skills/modern-web-guidance/vendor/modern-web-guidance/skills/modern-web-guidance/tfjs-model-minilm/tokenizer_config.json	https://github.com/GoogleChrome/modern-web-guidance-src.git	20a8ec7bf4ca581ccc4753fb75ab1448f9ac8800	src/rag/tfjs-model-minilm/tokenizer_config.json	Apache-2.0
+# wayfinder and the skills it calls (grilling, domain-modeling, research; setup-matt-pocock-skills configures its tracker). prototype is our adapted copy in skills/prototype.
+skills/wayfinder	https://github.com/mattpocock/skills.git	5863806dd4e15c63174bee4e7515a4256792ecfa	skills/engineering/wayfinder	MIT
+skills/grilling	https://github.com/mattpocock/skills.git	5863806dd4e15c63174bee4e7515a4256792ecfa	skills/productivity/grilling	MIT
+skills/domain-modeling	https://github.com/mattpocock/skills.git	5863806dd4e15c63174bee4e7515a4256792ecfa	skills/engineering/domain-modeling	MIT
+skills/research	https://github.com/mattpocock/skills.git	5863806dd4e15c63174bee4e7515a4256792ecfa	skills/engineering/research	MIT
+skills/setup-matt-pocock-skills	https://github.com/mattpocock/skills.git	5863806dd4e15c63174bee4e7515a4256792ecfa	skills/engineering/setup-matt-pocock-skills	MIT
