@@ -25,7 +25,7 @@ third-party.tsv at their pinned commits (bin/fetch-third-party.sh, also runnable
                      replace third-party folders that have local changes.
   --install-tools    Install missing required and recommended tools with Homebrew.
   --all-tools        With --install-tools, also install the optional tools.
-  --hooks            Add the retro SessionStart/SessionEnd hooks to each Claude Code profile's settings.json.
+  --hooks            Add the retro SessionStart/SessionEnd hooks and the polling guard (PreToolUse) to each Claude Code profile's settings.json.
   --rtk              Run bin/setup-rtk.sh to install the RTK hooks in every agent.
   -h, --help         Show this help.
 
@@ -466,16 +466,16 @@ fi
 
 # --- Retro hooks ------------------------------------------------------------
 if [ "$HOOKS" = 1 ]; then
-  section "Retro hooks"
+  section "Retro and guard hooks"
   command -v python3 >/dev/null 2>&1 || die "--hooks needs python3"
   dirs=$(claude_dirs)
   [ -n "$dirs" ] || say "  No Claude Code profile folder found (~/.claude). Start Claude Code once, then re-run."
   for d in $dirs; do
     settings="$d/settings.json"
-    python3 -I - "$settings" "$AGENTS_DIR/bin/retro-hook.py" "$DRY_RUN" "$STAMP" <<'PY' || warn "couldn't update $settings"
+    python3 -I - "$settings" "$AGENTS_DIR/bin/retro-hook.py" "$DRY_RUN" "$STAMP" "$AGENTS_DIR/bin/guard-polling.sh" <<'PY' || warn "couldn't update $settings"
 import json, os, shutil, sys, tempfile
 
-path, hook, dry, stamp = sys.argv[1], sys.argv[2], sys.argv[3] == "1", sys.argv[4]
+path, hook, dry, stamp, guard = sys.argv[1], sys.argv[2], sys.argv[3] == "1", sys.argv[4], sys.argv[5]
 shown = path.replace(os.path.expanduser("~"), "~", 1)
 try:
     with open(path) as f:
@@ -487,23 +487,26 @@ except json.JSONDecodeError as e:
 if not isinstance(data, dict):
     sys.exit(f"  error: {shown} must hold a JSON object")
 
-wanted = {
-    "SessionStart": ({"matcher": "startup"}, "pending"),
-    "SessionEnd": ({}, "session-end"),
-}
+# (event, matcher fields, command, text that marks it as already installed)
+wanted = [
+    ("SessionStart", {"matcher": "startup"}, f"python3 -I {hook} pending", "retro-hook.py pending"),
+    ("SessionEnd", {}, f"python3 -I {hook} session-end", "retro-hook.py session-end"),
+    # Rejects foreground polling loops and long sleeps, pointing to Monitor or run_in_background.
+    ("PreToolUse", {"matcher": "Bash"}, guard, "guard-polling.sh"),
+]
 hooks = data.setdefault("hooks", {})
 added = []
-for event, (extra, mode) in wanted.items():
+for event, extra, command, marker in wanted:
     entries = hooks.setdefault(event, [])
-    if any("retro-hook.py " + mode in json.dumps(e) for e in entries):
+    if any(marker in json.dumps(e) for e in entries):
         continue
-    entries.append({**extra, "hooks": [{"type": "command", "command": f"python3 -I {hook} {mode}", "timeout": 5}]})
+    entries.append({**extra, "hooks": [{"type": "command", "command": command, "timeout": 5}]})
     added.append(event)
 
 if not added:
     print(f"  ok       {shown}")
 elif dry:
-    print(f"  add      {', '.join(added)} retro hook to {shown}")
+    print(f"  add      {', '.join(added)} hook to {shown}")
 else:
     if os.path.exists(path):
         shutil.copy2(path, f"{path}.bak.{stamp}")
@@ -513,7 +516,7 @@ else:
         json.dump(data, f, indent=2)
         f.write("\n")
     os.replace(tmp, path)
-    print(f"  added    {', '.join(added)} retro hook to {shown}")
+    print(f"  added    {', '.join(added)} hook to {shown}")
 PY
   done
 fi
