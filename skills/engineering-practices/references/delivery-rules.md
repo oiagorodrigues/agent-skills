@@ -133,6 +133,7 @@ Watching prod after a deploy:
 
 - Watch for 30 to 60 minutes after the deploy finishes, longer for a path that runs rarely, with checks spread over the window (for example at 10, 30 and 60 minutes).
 - Look at the error tracker (new issues first seen in the deployed release, issues whose rate went up against the hour before), metrics and APM (error rate and latency of the changed endpoints or pages against the hour before, monitors in alert), alert channels, and the channels where people report bugs. `prod-evidence` holds the queries and the two-source rule.
+- Watch your own change: the endpoints, pages and jobs it touches. Other people's changes in the same release are theirs to watch; when the evidence points at one, report it to the user and don't follow its PR, ticket or thread.
 - Count a problem as caused by the deploy only when it touches the changed code or starts after the deploy time. Report what you checked, each number with its query and window, and the links.
 - A regression gets a fix branch from the trunk that links the original ticket and PR, through the same review. A severe incident gets reported at once instead of waiting for the fix; a revert is the user's decision.
 

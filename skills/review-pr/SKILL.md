@@ -54,6 +54,8 @@ Use when the user points at one comment, a thread, or all open comments on a PR,
 
 Use for "babysit", "watch", "keep an eye on" or "get this merged".
 
+Babysit only a PR that is the user's own or that the task gave you, and only its own CI, comments and threads. Another person's PR in the same queue group, release or channel isn't watched, answered or re-run; when it blocks this one, report it.
+
 Each pass:
 
 1. Check CI (`gh pr checks <n>`). For a failure, read the log (`gh run view <run-id> --log-failed`, plus `--job <job-id>` for one job; while the run is still going, `gh api repos/<o>/<r>/actions/jobs/<job-id>/logs` returns a finished job's log), find the root cause and fix it. Don't call a failure flaky or unrelated until it is reproduced or shown to fail on the base branch too. When a second fix fails the same check, run "Attack the premise" in `references/mechanism-defense.md` before writing a third.

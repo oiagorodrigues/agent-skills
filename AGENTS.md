@@ -108,6 +108,7 @@ When a coding task is done and the change is headed for a PR, decide with `revie
 
 - When fixing a bug or building something, don't create a summary file unless you are in plan mode or the user asks for one.
 - Never stop a process, container or dev server you didn't start (for example the user's dev server) without asking first.
+- Watch and act only on your own work: the PRs, review comments, Slack threads, merges and deploys of the task you were given. Don't poll, answer, re-run, rebase, merge or follow anyone else's PR, thread or deploy, even when it shares your release, merge queue or channel. When someone else's work blocks yours, report it to the user with the evidence and leave it alone.
 - Merging a PR is the user's call. Merge or enqueue a PR only when the user asks you to land that PR, even when it is approved and green; otherwise say it is ready to merge.
 
 ## Human to-do list
