@@ -73,7 +73,7 @@ In one message, in this order:
 
 1. The answer, in the first words ("Confirmed, there's no mass import today.").
 2. The reason or evidence, only when the reader doesn't already have it: the edge case, the number, the past incident, a link.
-3. One concrete ask by default: a yes/no, a choice, an owner, a date. Decide each time whether it's needed:
+3. One concrete ask by default: a yes/no, a choice, an owner. Decide each time whether it's needed:
    - Ask when someone has to decide, act or give information before the work moves on, when you raise a problem or a proposal, or when the thread would otherwise stall with no owner.
    - Skip it when the answer closes the question and the reader has nothing left to do (a factual answer, a status update, closing a loop), or when the answer already tells them what to do next ("The brand can add them under Customers.").
 
@@ -103,6 +103,7 @@ Don't mix readers in one message. A question for someone outside the conversatio
 
 **Asking for review, approval or a decision**
 - Ask for a decision, not for time: "I need a yes, no or not now on X by Thursday, Nov 6."
+- A date goes only in an ask to someone who decides for the business: product, leadership, legal, a customer-facing owner. Never put a date or "today" on a request to an engineer, a reviewer or another team's devs ("could you review this?", not "by tomorrow"); they set their own time.
 - Name one person who decides. A channel-wide or multi-tag ask spreads responsibility until nobody owns it.
 - Say what to read and how long it takes: a one-page summary or the two PRs that matter, and which one first.
 - Make "no" and "not me" acceptable answers ("If you aren't the right person, who is?"). It makes replying cheap.
@@ -168,6 +169,7 @@ Flag and fix any of these before handing it back:
 - A follow-up that points back to an earlier message instead of answering, or ends with "Is there something else I can help you with?".
 - Self-undercutting: apologies before the ask, "sorry to bother", "feel free to ignore", "no hard feelings", "or I'll drop it".
 - A vague closer with no action.
+- A date, "today", "tomorrow" or "ASAP" in a request to an engineer or reviewer. Only decision makers outside engineering get a date.
 - A problem with no proposed plan, or an opinion phrased as "maybe we could" instead of a recommendation.
 - A technical trade-off described only in technical terms, or decided without telling the people who own the business call.
 - A technical point with no business or user impact when the reader is product, business or leadership (latency, throughput, error rate or job count stated without what it means for customers, orders, revenue, support or team time).
