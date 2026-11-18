@@ -49,6 +49,7 @@ Before `harness-setup`, read the four rule files that the plugin expected to be 
 
 - `~/.agents/skills/harness-architect` is this skill folder. Expand `~` for tools that need an absolute path. "어시스턴트 프로젝트", "assistant project" and `[Assistant Project Root]` also mean this folder.
 - Some files use paths relative to this folder without saying so. These point here: a bare `.claude/rules/<name>.md` for one of the five rules above, any `.claude/templates/...` path, `scripts/<name>` for the scripts listed below, and `playbooks/<name>.md` when `<name>` is one of this folder's playbooks (for example `fresh-setup` or `harness-audit`). Every other `.claude/...`, `CLAUDE.md`, `playbooks/` or `docs/` path points to the target project (`{대상}`, `{target}`, `{대상 프로젝트}`).
+- The phase artifacts `docs/<request>/NN-*.md` are committed with the target project, so write every path in them relative to the target project root, never with the user's home folder or another absolute path. Subagent briefs carry absolute paths; convert them before writing an artifact.
 - Template skills under `.claude/templates/` are stored as `SKILL.md.template` so this folder holds only one `SKILL.md`. Write them into the target as `SKILL.md`.
 
 ## Subagents
