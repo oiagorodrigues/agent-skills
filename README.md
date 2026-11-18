@@ -289,4 +289,4 @@ The source of async-python-patterns, django-expert, postgres-best-practices, rev
 
 ## License
 
-MIT (`LICENSE`), for everything in this repo except the third-party skills above and the passages a skill credits to another source. Those keep the license their author gave them, as each folder or credit line says.
+MIT (`LICENSE`), for everything in this repo except the third-party skills above and the passages a skill credits to another source. Those keep the license their author gave them, as each folder or credit line says; `THIRD_PARTY_NOTICES.md` collects their copyright and license notices.
