@@ -327,6 +327,8 @@ You see it broken when one change edits many files (Shotgun Surgery), when a met
 
 It hurts when it chases zero coupling: an event bus or an interface between two modules that are really one hides the dependency instead of removing it. Some coupling is the point; make it explicit and one-directional.
 
+To judge one coupling, weigh three things. Strength, from strongest: reading the other side's internals or tables, sharing a business rule or a transaction, using its domain model, using a contract built for integration. Distance: same function, module, app, service, team. Volatility: how often the upstream changes. Strong coupling is fine at short distance, where it is cohesion, and against a module that rarely changes, such as auth or email. Across a service or team boundary, keep it to a contract. A business rule copied into two modules couples them even with no import between them.
+
 Bad: shipping reaches into billing's storage.
 
 ```python
@@ -346,7 +348,7 @@ weight = order_weight_kg(order.id)
 
 Review question: when this changes, what else has to change, and is that list inside one module?
 
-Source: Yourdon and Constantine, Structured Design; Hunt and Thomas, The Pragmatic Programmer (orthogonality).
+Source: Yourdon and Constantine, Structured Design; Hunt and Thomas, The Pragmatic Programmer (orthogonality); Vlad Khononov, Balancing Coupling in Software Design, via `coupling-analysis` in tech-leads-club/agent-skills (MIT, https://github.com/tech-leads-club/agent-skills).
 
 ## 11. Composition over inheritance
 

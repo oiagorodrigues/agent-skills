@@ -1,6 +1,6 @@
 # <TICKET> plan
 
-Write this before larger work (`SKILL.md`, "How to work"), in an interactive session or as a pipeline's plan stage. A short read-only check passes it only when every criterion has a check, the files cover every criterion and no step leaves the scope (`reducing-ai-slop.md`).
+Write this before larger work (`SKILL.md`, "How to work"), in an interactive session or as a pipeline's plan stage. A short read-only check passes it only when every criterion has a check, the files cover every criterion and no step leaves the scope (`reducing-ai-slop.md`). The "Hard to reverse" section adapts the one-way doors of Tech Leads Club's `tlc-plan` (tech-leads-club/agent-skills, CC-BY-4.0, https://github.com/tech-leads-club/agent-skills), changed.
 
 **Repo:** <repo> · **Base:** <branch> · **Test command:** `<exact command for the changed files>`
 
@@ -17,6 +17,9 @@ OUT: <adjacent work this ticket must not touch>
 
 ## Steps
 1. <change, file, the AC it serves>
+
+## Hard to reverse
+Each part of this change a revert won't undo: a migration on a populated table, a field or event another service reads, a new dependency, a backfill, data written in a new shape, a message sent to customers. One line each, with the alternative rejected and why. "None" with the reason is a valid answer.
 
 ## Acceptance criteria
 One pass/fail line each, with how to check it on the running result (see `reducing-ai-slop.md`).
