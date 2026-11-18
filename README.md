@@ -281,7 +281,7 @@ Put local rules for these skills in `AGENTS.md`, because an edited copy blocks t
 | system-design | system-design-skills plugin by Proyecto 26 | MIT (`LICENSE`) |
 | typesafe-ai | https://github.com/typesafe-ai/skills (in `.skill-lock.json`) | MIT (`LICENSE`) |
 | vue-best-practices, vue-pinia-best-practices, vue-router-best-practices, vue-testing-best-practices | github.com/vuejs-ai (hyf0, SerKo) | MIT (`LICENSE.md`) |
-| wayfinder, grilling, domain-modeling, research, setup-matt-pocock-skills | Matt Pocock, https://github.com/mattpocock/skills (installed by `bin/fetch-third-party.sh`; wayfinder runs only when the user types `/wayfinder`) | MIT |
+| wayfinder, grilling, domain-modeling, research | Matt Pocock, https://github.com/mattpocock/skills (installed by `bin/fetch-third-party.sh`; wayfinder runs only when the user types `/wayfinder`) | MIT |
 | watch-video | Ketan; scripts from https://github.com/bradautomates/claude-video | MIT (`LICENSE`, `THIRD_PARTY_NOTICES.md`) |
 | web-design-guidelines | Vercel | not recorded |
 

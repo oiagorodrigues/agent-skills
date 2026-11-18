@@ -1,6 +1,6 @@
 ---
 name: jira-workflow
-description: Use for any Jira work through the Atlassian MCP. That covers deciding whether something deserves a ticket, drafting and creating a ticket or an epic with its tasks, updating a ticket's description, checking whether a ticket or PR is really related to an issue (not just sharing keywords), linking related tickets, closing an absorbed task as Won't Do, moving status when a PR opens or goes to review, and reading "See checklist below" checklists.
+description: Use for any Jira work through the Atlassian MCP. That covers deciding whether something deserves a ticket, drafting and creating a ticket or an epic with its tasks, updating a ticket's description, checking whether a ticket or PR is really related to an issue (not just sharing keywords), linking related tickets, closing an absorbed task as Won't Do, moving status when a PR opens or goes to review, reading "See checklist below" checklists, and the Jira tracker operations the wayfinder skill asks for.
 ---
 
 # Jira workflow
@@ -62,3 +62,16 @@ Transition IDs: use the ones the workspace values list. For any other status, lo
 ## Checklists
 
 When a description says "See checklist below", read the items with `getJiraIssue` and `properties: ["<checklist property>"]`, using the property the workspace values name. When the property doesn't carry a checked or unchecked state per item, don't report which items are done.
+
+## Wayfinding operations
+
+The `wayfinder` skill asks for the tracker's "Wayfinding operations". In a Jira workspace they are these; no per-repo setup file is needed.
+
+- Project: the team's project for the work, from the workspace values. Ask the user once when the work spans teams.
+- The map: an Epic labelled `wayfinder:map`, with the map body as its description. Its tickets are the epic's children (`parent` = the epic's key), each labelled with its `wayfinder:<type>` and no other wayfinder label.
+- Claim: assign the ticket to the user before any work. An open, unassigned child is unclaimed.
+- Blocking: Jira's native "Blocks" issue link (the blocker "blocks" the blocked ticket), created in the second pass once both keys exist. Use `createIssueLink` with the link type `getIssueLinkTypes` names "Blocks".
+- Frontier: `parent = <MAP> AND statusCategory != Done AND assignee is EMPTY ORDER BY created ASC`, then drop each result with an inward "is blocked by" link to a ticket that isn't Done. JQL can't filter on a blocker's status, so check the links from `getJiraIssue`.
+- Resolve: post the answer as a comment, move the ticket to Done, and append the context pointer to the epic's "Decisions so far".
+- Out of scope: close the ticket as Won't Do and add its line to the map's "Out of scope".
+- Research branches: wayfinder pushes a `research/<name>` branch in the repo the work belongs to and opens no PR; delete it once the map is done.
