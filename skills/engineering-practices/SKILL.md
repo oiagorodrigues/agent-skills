@@ -258,10 +258,13 @@ These are the rules for writing code. To review a diff, PR or feature for securi
 ## Infrastructure as code
 
 - Format, lint and CI prove style, not behavior. A change is verified only after you read the whole plan or dry run, including drift from earlier changes. Call out every replace or destroy.
+- Judge a Terraform plan by each resource's action, not the summary. A replace shows as `-/+` or `+/-` with "must be replaced" and counts as one add plus one destroy, so any `to destroy` above 0 is a destroy or a replace. In the JSON plan, read `resource_changes[].change.actions` and `replace_paths`. A resource the change doesn't touch in the plan is drift or an earlier unapplied change: explain it before going on.
+- An in-place update can still disrupt: an instance refresh, a cluster version, a database reboot, security group rules, IAM policies. Name its runtime effect in the PR. A `(sensitive value)` that forces a replacement, or a hidden image or `user_data` change, has to be resolved before calling the change safe.
 - Apply only through the reviewed pipeline, never from a laptop against shared state. Coordinate state moves and imports with the owner.
 - Change every parallel environment the change belongs to, or name the ones skipped.
 - Reusable modules are versioned and pinned; don't copy them into consumers. Validate a module change in a consuming plan before review.
-- Renaming a stable resource identifier forces a replacement and breaks consumers: avoid it or add an explicit move.
+- Renaming a stable resource identifier forces a replacement and breaks consumers: avoid it or add an explicit move (a Terraform `moved` block, kept once published). Prefer `for_each` keys over `count` indexes, so reordering a list doesn't move resources. `prevent_destroy` doesn't stop the destroy that deleting the resource block causes.
+- No `-target`, `-lock=false` or `-refresh=false` in routine work, and force-unlock only your own lock. (Terraform's own docs: https://developer.hashicorp.com/terraform/cli/commands/plan, https://developer.hashicorp.com/terraform/language/state/locking)
 
 ## Commits, PRs and review
 
