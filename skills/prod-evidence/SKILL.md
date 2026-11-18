@@ -1,6 +1,6 @@
 ---
 name: prod-evidence
-description: Use whenever a claim about production or staging needs proof from real data instead of an assumption. Covers Datadog APM, RUM, logs and deploys, Sentry errors, trace span analysis, data warehouse and staging database queries, proving a number on two sources, calling a CI failure flaky, and when prod shell, kubectl or database access is allowed (only when the user says so). Sets how to report the result, always with numbers, the time window, the query used and a direct link. Use it from triage, Jira tickets, PR reviews, incident work and perf investigations.
+description: Use whenever a claim about production or staging needs proof from real data instead of an assumption, including a reported number that looks wrong or surprising. Checks that the records behind a surprising number are plausible before explaining it. Covers Datadog APM, RUM, logs and deploys, Sentry errors, trace span analysis, data warehouse and staging database queries, proving a number on two sources, calling a CI failure flaky, and when prod shell, kubectl or database access is allowed (only when the user says so). Sets how to report the result, always with numbers, the time window, the query used and a direct link. Use it from triage, Jira tickets, PR reviews, incident work and perf investigations.
 ---
 
 # Prod evidence
@@ -8,6 +8,19 @@ description: Use whenever a claim about production or staging needs proof from r
 Confirm with real data. Never assume how production behaves from reading code or one trace.
 
 Workspace values (data sources and how to reach them, Datadog retention, cluster limits, SQL rules for the user's client) come from the workspace's own instructions, or from the "Values for prod-evidence" section of the workspace skill for the repo when one exists.
+
+## Plausibility before explanation
+
+A surprising number is more often a data or processing error than a real event (Twyman's law, https://en.wikipedia.org/wiki/Twyman%27s_law). So before explaining how a number came out, check that the records behind it describe something a real business would do. Correct arithmetic only proves the formula; it says nothing about whether the inputs are right.
+
+1. Estimate the expected value before querying, from an independent baseline: the same entity's other periods, its peers, or a rough count (orders times a typical order value). A result 10 times or more away from that estimate is a data question first.
+2. Rank the rows by their share of the gap. When one row or a handful carry most of it, read their raw values and the history of the same product, customer or account before anything else.
+3. Put each input of those rows in business terms and ask whether a person would do it: the implied discount (1 − price paid ÷ list price), the unit price against the product's usual price, the quantity against the customer's usual order, a unit that changed between fields. A near-total discount on a large order, or a list price in one unit and a sale price in another, is a bad record, not a sale.
+4. Search the whole dataset for the same shape (other entities with the same implausible input) and report how many there are, so the fix targets the rule as well as the one record.
+
+Lead the report with the verdict on the input, then the arithmetic as proof, then the count from step 4.
+
+For example, the owner of a coffee wholesaler that sells about $3M a month opens the sales dashboard and sees $185M for March. One answer traces the gross sales formula and confirms that list price times quantity adds up to $185M. It's correct, and it doesn't help the owner. The useful answer notices that a single order line sold 10,126 bags at $6.50 each, while the line kept a list price of $18,000, the price of a whole pallet. The dashboard reads that gap as a 99.96% discount, and nobody gives that on 10,000 bags, so the line is wrong. That answer opens with the bad line, shows the arithmetic after it, and ends with how many other customers have lines like it.
 
 ## Datadog
 

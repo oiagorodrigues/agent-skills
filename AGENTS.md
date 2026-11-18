@@ -14,7 +14,7 @@ Load these skills every time their trigger applies, before you start that part o
 - `reply-with-standing`: you write, rewrite or review a message that goes to another person on the user's behalf (Slack, DM, email, PR review comments and replies, Jira and Confluence comments), including replies drafted inside other skills.
 - `create-pr`: you write or edit a PR description, in any repo.
 - `review-pr`: any PR task (reviewing a PR or diff, answering review comments, inline comments, babysitting a PR) and the local review before opening a PR (see below).
-- `prod-evidence`: a claim about production or staging needs proof from real data, or you need an observability tool, the data warehouse or cluster access.
+- `prod-evidence`: a claim about production or staging needs proof from real data, a reported number looks wrong, or you need an observability tool, the data warehouse or cluster access.
 - `debugging`: a bug, crash, failing or flaky check, wrong data or error spike needs its cause found, locally or in staging or production. Build the red feedback loop before any theory.
 - `perf-review`: the task is about speed (make it faster, why is it slow, a measured regression). It reports without changing code, so wait for the user to pick a fix, and never answer "make it faster" with a cache before it runs. Skip it for ordinary feature work.
 - `brainstorming`: before building or planning something new when the request leaves real questions open, and when the user asks to brainstorm or get pushback. Nothing gets built until the user approves the design.

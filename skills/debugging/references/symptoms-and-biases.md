@@ -45,6 +45,7 @@ The mistakes that come for everyone:
 - **Restarting first.** Restart hides the evidence. Restart only after capturing state.
 - **Blaming the network.** It is occasionally the network. Most of the time, the network is fine and the timeout is wrong.
 - **Stopping at the first plausible explanation.** A wrong root cause is worse than no root cause; you ship a misfix.
+- **Explaining a wrong number instead of doubting its inputs.** Tracing how a formula produced a surprising total proves the formula, not the data. Check that the records behind it are plausible first (`prod-evidence`, "Plausibility before explanation").
 - **A third fix on the same premise.** After two failed fixes that rest on one assumption, test the assumption itself before trying again. Every new attempt needs a changed hypothesis; the same idea retried only adds states to debug.
 - **"Works on my machine" as a verdict.** It works on your machine because your state is different. Find the state difference.
 - **Big-bang fix.** Multiple unrelated changes in one PR after an incident. If one of them is wrong, you do not know which.
