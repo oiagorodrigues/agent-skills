@@ -37,6 +37,12 @@ Cover each kind below. Each item in the report carries a `file:line`, or "none" 
 
 A symbol search misses the breakage that matters most. Follow these by hand: the source of a library the change calls, at its pinned version and with any local patch; the JSON an API returns and the code that parses it; a database column another job or service reads; a wire format or bytes another language reads; a feature flag that forks the path; dynamic dispatch (`getattr`, task names as strings, signal receivers, DRF router names, dynamic components, i18n keys, templates that read attributes by name); and code three hops downstream. Work out when things run, too: on commit hooks, unmount and teardown, retries, timeouts.
 
+Three more places a caller search can't reach:
+
+- Neighbors. Code that never calls the change but acts on the same object at runtime: other scripts on the same page, handlers on the same event, hooks, middleware, signals, other writers of the same record. When the change captures or compares state (a snapshot, a baseline, a dirty check, a cache, a diff), list everything else that changes that state and when it runs relative to the capture: on load, after it, on a user action. A neighbor that changes the state after the capture makes the change read the neighbor's work as the user's.
+- What the old path got for free. When the change replaces or bypasses a path, or claims to behave like it ("same as a full save", "no behavior change"), list the implicit rules the old path leaned on, such as a framework default for an omitted value, an input the browser never sends, an ORM hook or a validator. Then check each state the old path handled (empty, omitted, disabled, hidden, null, a field with a default and one without) through both paths. Each must come out the same, or the difference goes on the intent list.
+- Hand-built inputs. Tests that build the request, event or payload themselves agree with the author's model of the producer, not with the producer. Capture one real input (the rendered page's form data, a real event, a real API response) and compare it with what the tests send. A field that differs is a finding until it's explained.
+
 ## 4. The one fact it's safe because of
 
 Most changes that look risky are safe because of a single fact ("this only drops cache entries that are already dead", "no caller passes `None` here"). Find it and spend the time proving it instead of on a long list of maybes. Push it as far down this ladder as is cheap, and say where it stopped:
@@ -60,9 +66,10 @@ When the trace shows a trigger the diff alone didn't (a changed helper reached f
 - What the change does, including the part the diff doesn't spell out.
 - Areas reached: each feature, module, job, repo or project, with `file:line` or the search that found it.
 - Side effects: behavior other code, another service or a user now sees, each with its path from the change.
+- Neighbors and old-path rules from step 3, each checked or "none" with the search.
 - Breakages: confirmed or likely, each with `file:line` in the affected code (the other repo's path for cross-repo), likelihood × impact, and how it was checked.
 - Cleared: what was checked and why it's fine, one line each.
 - The safety fact, the ladder step it reached and its proof, or "unproven".
 - Specialist triggers found by the trace, if any.
 
-Done when every changed symbol has its outside callers named, every shared datum its other readers and writers, and every contract its consumers, or "none" with the search that was run.
+Done when every changed symbol has its outside callers named, every shared datum its other readers and writers, every captured state its other writers, and every contract its consumers, or "none" with the search that was run.
