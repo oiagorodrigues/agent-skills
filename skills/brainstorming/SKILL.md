@@ -35,10 +35,12 @@ Your job is to find where the idea is weak. Run these checks throughout the conv
 - A request like "use Kafka" or "add a cache" is a solution. Ask what problem it solves and how they know it's the problem. If the problem doesn't need that solution, say so.
 - Every plan rests on assumptions ("most buyers order from mobile", "this runs once a day"). Name the one the plan depends on most, and ask whether it's true or verify it yourself in the code, data or docs.
 - When a claim drives the design ("it's slow", "customers keep asking for this"), ask for the number, the ticket or the log behind it. A guess is fine as long as both of you know it's a guess.
+- Tell which kind of problem it is before asking what it costs. A pain happening today has a cost you can measure. A missing capability has no today, so ask who can't do it and what they do instead (a spreadsheet, a ticket, a competitor, giving up): the substitute is the evidence. The next piece of something under construction is judged by what stalls without it.
+- Before looking up data, name the number that would change the decision, then get that one. A number nobody tracks isn't a small number; ask the people who'd know and mark what they said as their estimate.
 - Say what the idea costs that they haven't mentioned: maintenance, a migration, a new dependency, on-call load, a slower path somewhere else.
 - For an improvement, a new feature or an architecture, ask which business outcome it moves (revenue, retention, cost, risk, support load, team time) and how you'd know it moved. The goal is delivering the right thing with the right outcome. A better design that changes nothing for customers or the business isn't the right thing yet, so say that.
 - Always consider doing less: a config change, a manual step, the tool they already have, or not doing it at all. If one of those covers the why, put it on the table.
-- Ask how it fails and what happens then, for the one or two failures that would matter.
+- Run a short pre-mortem: say it's six months later and this failed, and write the one or two most likely stories of how, each with the trigger, a number or threshold, what it set off next and who noticed. Then name the early sign that would show it's heading there, and check whether the design blocks it. (Adapted from Jeffallan's `the-fool` in tech-leads-club/agent-skills, CC-BY-4.0, https://github.com/tech-leads-club/agent-skills.)
 
 How to disagree:
 
@@ -60,6 +62,8 @@ If they didn't ask for brainstorming, add one light line after your question: "O
 
 Open questions (no obvious answer, their intent decides) go one per message, in one sentence, with no list of example answers hanging off it, because stacked open questions get half-answered. Questions you can already answer go together in one numbered round: each with your recommended answer and the reason, worded so a plain "yes" accepts all of them and they only need to correct the ones they disagree with. Send fact lookups (what the code does, what exists, real numbers) to a subagent instead of asking them, so they only answer decisions. Use plain language and their vocabulary, and never quote this skill to them. (Batched recommended answers adapted from Matt Pocock's grill-me, MIT, https://github.com/mattpocock/skills.)
 
+Walk the main sequence with them and ask what should happen beside the happy path: empty, first time, retry, half-finished, expired, not allowed, left and picked up the next day. Spend the questions on the path that carries most of the volume.
+
 Get them describing. Open questions come first, because their words carry intent your options can't. Offer a short multiple-choice menu only when they're stuck. When they say "just guess", propose something concrete with your reason.
 
 Make each question build on their last answer or on something you found, so it surfaces a consequence or a case they may have missed. A proposal they can correct often beats a question.
@@ -72,7 +76,7 @@ When looking further would help (deeper into the codebase, their files, the web)
 
 ## Lay out the approaches
 
-Once you understand what they want, and before writing anything up, send the ways of building it in a message of their own. Generate several, drop the weak ones (including any that work against their why or that the existing work rules out), and present the 2-3 that remain, each grounded in what the project actually does and what it trades off. Include a do-less option whenever one is credible.
+Once you understand what they want, and before writing anything up, send the ways of building it in a message of their own. Generate several, drop the weak ones (including any that work against their why or that the existing work rules out), and present the 2-3 that remain. Before listing them, name the two to four criteria that decide (cost, time to ship, reversibility, risk, the business outcome), and compare every approach on those same criteria, so the criteria can't be picked to fit a favorite. Ground each one in what the project actually does and what it trades off. Include a do-less option whenever one is credible.
 
 Lead with your recommendation and why, even when it isn't the approach they came in with. If you think their preferred approach is the wrong one, say that directly. If there is genuinely one sensible way, say so and why the others don't fit. Then ask which way they want to go.
 
@@ -90,7 +94,7 @@ If the work grows mid-task, say so and step up a size. If it is really several i
 
 ## The written design
 
-Write a plain document a capable builder in the domain could plan from without follow-up questions. Cover the intent and the why, including the business outcome it should move and the signal that shows it did; goals, non-goals and anti-goals; constraints; approaches; the decisions they made, as they made them; your calls, marked as yours; accepted risks, meaning the objections raised and why they chose to proceed; and what's left to the builder. Cut anything nobody asked for.
+Write a plain document a capable builder in the domain could plan from without follow-up questions. Cover the intent and the why, including the business outcome it should move and the signal that shows it did; goals, non-goals and anti-goals; constraints; approaches; the decisions they made, as they made them; your calls, marked as yours; accepted risks, meaning the objections raised and why they chose to proceed; and what's left to the builder. Write each assumption the design rests on with what would show it's false ("two engineers free in Q3", "volume stays under 5x"), so a later failure can be traced to a broken assumption instead of a bad decision. Cut anything nobody asked for. (Problem kinds, the deciding number and journey states adapted from `tlc-discover` and `tlc-prd`, Tech Leads Club; criteria before options and assumption triggers from `create-rfc`, Tech Leads Club; all in tech-leads-club/agent-skills, CC-BY-4.0, https://github.com/tech-leads-club/agent-skills, changed to fit this skill.)
 
 Ask where it should go. In a repo, follow the project's convention for design docs if it has one. Commit it only if they want it committed.
 
