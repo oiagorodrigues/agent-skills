@@ -57,7 +57,7 @@ Verify every fact before you state it, in every kind of output: chat answers, re
 
 ## Compact instructions
 
-When you summarize a conversation to compact it, keep what the next turn can't re-derive: the user's decisions and corrections in their own words, each file you changed and whether it is committed, exact identifiers (PR, ticket, commit, URL, path), open tasks and who owns each, and which facts were verified and which inferred. Mark what came from a file you read and what is from memory, so the next turn knows what to re-read.
+When you summarize a conversation to compact it, open the summary with "My task:" and the ticket, PR and goal the user gave you, in their words, and list any other PRs or tickets that came up as not yours, so the next turn keeps working on its own task. Then keep what the next turn can't re-derive: the user's decisions and corrections in their own words, each file you changed and whether it is committed, exact identifiers (PR, ticket, commit, URL, path), open tasks and who owns each, and which facts were verified and which inferred. Mark what came from a file you read and what is from memory, so the next turn knows what to re-read.
 
 ## Sensitive values
 
@@ -98,7 +98,7 @@ When a coding task is done and the change is headed for a PR, decide with `revie
 
 ## Subagents
 
-- Hand noisy work to a subagent so the main session keeps the conclusions, not the raw output. That covers multi-step shell work, log and trace digging, observability, data warehouse or database queries, broad code searches, and reading long files or command output. The brief names the question, where to look and what to return: the answer, each number with its source, time window and query, and `file:line` references. Ask for a compact report, never a dump. Run a single short command, or a lookup whose target you already know, in the main session, because writing the brief costs more than the call. Once you delegate a check, wait for the report instead of running it yourself too.
+- Hand noisy work to a subagent so the main session keeps the conclusions, not the raw output. That covers multi-step shell work, log and trace digging, observability, data warehouse or database queries, broad code searches, and reading long files or command output. The brief names the question, where to look and what to return: the answer, each number with its source, time window and query, and `file:line` references. Ask for a compact report, never a dump, with a hard cap (for example at most 15 findings, one or two lines each, most severe first), and tell the agent to write the full report to a file in the scratchpad and return its path with the top items, because a long report gets cut off and costs a follow-up message. Run a single short command, or a lookup whose target you already know, in the main session, because writing the brief costs more than the call. Once you delegate a check, wait for the report instead of running it yourself too.
 - Every brief says: "Do only what this brief asks. Don't remove, change or clean up anything else, even if it looks wrong or related. If you think something else should change, list it under 'Proposals' in your report and leave the code as it is."
 - When several agents work on the same app at once, each brief gives the agent its own port by number, lists the other agents' ports, and gives it a temporary home with auto-launch off, and says not to open the app, a browser tab or a desktop window and not to stop a process it didn't start. The main session does the visual and manual checks, one at a time. Agents in parallel worktrees get the absolute worktree path in the brief, write only under it and check their own `git status` before committing.
 - Read each report, including any "decisions beyond the brief", for anything not asked for and treat it as a regression: revert it or ask the user before accepting it. Never pass it on as a footnote.
@@ -109,7 +109,7 @@ When a coding task is done and the change is headed for a PR, decide with `revie
 
 - When fixing a bug or building something, don't create a summary file unless you are in plan mode or the user asks for one.
 - Never stop a process, container or dev server you didn't start (for example the user's dev server) without asking first.
-- Watch and act only on your own work: the PRs, review comments, Slack threads, merges and deploys of the task you were given. Don't poll, answer, re-run, rebase, merge or follow anyone else's PR, thread or deploy, even when it shares your release, merge queue or channel. When someone else's work blocks yours, report it to the user with the evidence and leave it alone.
+- Watch and act only on your own work: the PRs, review comments, Slack threads, merges and deploys of the task you were given. Don't check, verify, review, poll, answer, re-run, rebase, merge or follow anyone else's PR, ticket, thread or deploy, even when it shares your release, merge queue or channel, unless the user asks for that one by name. When someone else's work blocks yours, report it to the user with the evidence and leave it alone.
 - Merging a PR is the user's call. Merge or enqueue a PR only when the user asks you to land that PR, even when it is approved and green; otherwise say it is ready to merge.
 
 ## Human to-do list
