@@ -2,6 +2,8 @@
 
 A write-up structured around the reasoning loop, so trade-offs and failure
 behavior are first-class — not footnotes. Keep each section tight.
+The rollout section adapts the rollback plan of `create-technical-design-doc`
+(tech-leads-club/agent-skills, MIT).
 
 ## 1. Problem & scope
 Core functional requirements, key non-functional constraints, and explicit
@@ -40,7 +42,13 @@ and recovery without stampede. What the user experiences during each failure.
 The current bottleneck, and what changes at the next order of magnitude (10×/100×).
 What metric signals it's time to evolve.
 
-## 9. Open questions
+## 9. Rollout and rollback
+How it ships (flag, slice or canary, per section 3 of
+`~/.agents/skills/engineering-practices/references/delivery-rules.md`), the metric and threshold that trigger a
+rollback, the rollback steps, and what a rollback can't undo (a migration, data
+written in the new shape, messages already sent).
+
+## 10. Open questions
 Assumptions to confirm; things deferred for time.
 
 ---

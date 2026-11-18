@@ -11,6 +11,10 @@ transactions stay inside one service. Heuristics:
 - **Change coupling:** parts that always change together belong together.
 - **Conway's law:** boundaries that don't match team ownership generate constant
   cross-team coordination — align services to teams.
+- **Language:** when the same word means different things on two sides (a
+  purchasing "order" and a fulfillment "order"), that's a seam; when both sides
+  use the same words with the same meaning, they are probably one context. (From
+  `modular-design-principles`, tech-leads-club/agent-skills, MIT.)
 
 ## Strangler-fig migration (monolith → services)
 Don't rewrite. Put a façade (gateway) in front of the monolith, then carve out
