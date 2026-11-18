@@ -10,7 +10,7 @@ Write a PR description a reviewer reads in under a minute and comes away knowing
 ## Before writing
 
 1. Load the `plain-writing` skill and apply it to every sentence, including the title and the commit message.
-2. Gather the facts: the diff (`git diff <base>...HEAD` or `gh pr diff <n>`), the Jira ticket (from the branch name, commits or the user), related PRs, and how the change was verified. Before linking a ticket or a related PR, read it and confirm the diff addresses it, with the "Checking whether a ticket or PR is related" check in the `jira-workflow` skill. Never tag a ticket picked from a keyword search; if the branch's ticket doesn't match the diff, tell the user instead of linking it.
+2. Gather the facts: the diff (`git diff <base>...HEAD` or `gh pr diff <n>`), the Jira ticket (from the branch name, commits or the user), related PRs, and how the change was verified. Before linking a ticket or a related PR, read it and confirm the diff addresses it, with the "Checking whether a ticket or PR is related" check in the `jira-workflow` skill. Never tag a ticket picked from a keyword search; if the branch's ticket doesn't match the diff, tell the user instead of linking it. Map each change to the ticket whose acceptance criteria it meets, and write "Fixes" only when the diff meets every AC of that ticket; otherwise name the ACs it covers. Never credit a ticket that is assigned to someone else or that the user didn't work on, and cite it as related only when it passes that check on substance.
 3. Write as the author ("I removed", "this PR deletes"), following the "Write as the author" section of `plain-writing`.
 
 ## Format

@@ -9,6 +9,8 @@ Method adapted from Matt Pocock's diagnosing-bugs (MIT, https://github.com/mattp
 
 The rules in `engineering-practices` still apply: fix the root cause, never call a failure "pre-existing" without proving it on the base branch, and stop after about three fix attempts on changed hypotheses. Production shells and prod database queries need the user's explicit yes for this task (AGENTS.md); get production data through `prod-evidence`.
 
+When the user says they can't reproduce a result you reported (a bug on the base branch, a fix that works), re-run it yourself first, on the exact branch, commit and container they use, and report what you saw. Say which commit and container your earlier run used. The new run decides; don't defend the earlier result.
+
 ## Phase 0: Mode and symptom
 
 1. **Active incident** (customers hurt right now): stop the bleeding first (roll back, flag off, block the traffic), capture state before any restart (logs, metrics, traces), tell people, and root-cause after. Propose the mitigation to the user; don't run it on shared environments yourself.

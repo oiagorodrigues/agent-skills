@@ -44,6 +44,8 @@ Do this for every reply, before the first draft and not only after someone pushe
 1. Check every claim on both sides, the user's, the other person's and any you were about to add, with the "Facts and evidence" rule in `~/.agents/AGENTS.md` and the `prod-evidence` skill (which queries to run, which sources to use, how to report the numbers).
 2. **Tell the user the verdict before drafting:** which side the evidence supports, the one or two numbers that decide it, and the weakest point in the user's position. When the evidence favors the other person, recommend agreeing and draft that reply: acknowledge them in the first sentence and say what changes. Draft the user's side only if they still want it after hearing this, and put the weak point in "check before sending".
 
+3. Claims about people are facts too. Say who owns or knows an area only with evidence (the repo's CODEOWNERS, git history, the team's page). A reviewer's comment doesn't change a ticket's acceptance criteria; only the user or the ticket's owner does.
+
 Keep the research proportional: one or two queries per decisive claim. Stop once a claim is settled.
 
 ### Technical proposals and design pushback
