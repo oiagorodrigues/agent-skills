@@ -285,3 +285,7 @@ Put local rules for these skills in `AGENTS.md`, because an edited copy blocks t
 | web-design-guidelines | Vercel | not recorded |
 
 The source of async-python-patterns, django-expert, postgres-best-practices, reverse-engineer-anything, site-seo-aeo-audit, vercel-troubleshooter, codebase-requirements-analyst, product-onboarding and agent-browser isn't recorded in their folders.
+
+## License
+
+MIT (`LICENSE`), for everything in this repo except the third-party skills above and the passages a skill credits to another source. Those keep the license their author gave them, as each folder or credit line says.
