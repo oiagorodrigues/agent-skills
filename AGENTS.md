@@ -120,6 +120,7 @@ When work still needs something only the user can do (approve or merge a PR, rev
 - Drop items that are done. If something got done partly, or changed (for example a PR picked up a review comment, or now needs a rebase), update the item to match.
 - List every pending human action, not only the ones from this turn, so the list is always the full picture.
 - Order items by what unblocks what, and say when one waits on another ("after #4777 is applied").
+- Describe each item by what it is ("push the Terraform rules to agent-skills"), never by a commit hash or internal id alone, which the user can't place.
 - Name what to do and where: the raw URL of the PR, ticket or settings page (see "Links" above).
 - If nothing is left for the user, leave the section out.
 - "Add a to-do for me" or "remind me to" is an item for this list, not a task for you.
