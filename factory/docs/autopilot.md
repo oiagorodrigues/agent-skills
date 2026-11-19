@@ -113,7 +113,7 @@ The checks before each gate opens are the same ones the user would look at: veri
 - A batch is the PRs for one channel that became ready since that channel's last thread, closed when `batch_minutes` pass after the first one (my call: 60) or when `batch_max` PRs are ready (my call: 5).
 - A PR enters a thread only when verify passed with proof, CI is green on its head and the local review has no open "Act on".
 - One message per batch: one line per PR (title, repo, link, size, the one risk a reviewer should look at), written with `reply-with-standing`, sent from Slack web in Chrome (headless `--chrome`, as the brag routine does); the Slack connector only when the browser fails, noted in the run log.
-- New tickets later get new threads; the autopilot never edits or bumps an old thread, and replies in a PR's thread only to say it was updated after a review.
+- New tickets later get new threads; the autopilot never edits or bumps an old thread. After a push that dismisses an approval or answers review comments, it re-requests the review on GitHub and waits, with no Slack message. It posts in a PR's thread again only when the PR changed in a way reviewers must know (a new approach, a prod bug), as "Could you take another look?" with no @mention, following `reply-with-standing`'s "Asking for a PR review".
 
 ## Concurrency and isolation
 

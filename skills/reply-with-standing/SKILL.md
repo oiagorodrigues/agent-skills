@@ -102,12 +102,21 @@ Don't mix readers in one message. A question for someone outside the conversatio
 ## 5. Rules by situation
 
 **Asking for review, approval or a decision**
-- Ask for a decision, not for time: "I need a yes, no or not now on X by Thursday, Nov 6."
-- A date goes only in an ask to someone who decides for the business: product, leadership, legal, a customer-facing owner. Never put a date or "today" on a request to an engineer, a reviewer or another team's devs ("could you review this?", not "by tomorrow"); they set their own time.
+- Ask for a decision, not for time: "Can you give me a yes, no or not now on X?"
+- A date goes only in an ask to someone who decides for the business: product, leadership, legal, a customer-facing owner ("I need a yes or no on X by Thursday, Nov 6, to keep the release date."). Never put a date, a time or "today" on a request to an engineer, a reviewer or another team's devs ("could you review this?", not "by tomorrow"); they set their own time.
 - Name one person who decides. A channel-wide or multi-tag ask spreads responsibility until nobody owns it.
 - Say what to read and how long it takes: a one-page summary or the two PRs that matter, and which one first.
 - Make "no" and "not me" acceptable answers ("If you aren't the right person, who is?"). It makes replying cheap.
 - Don't open with apologies, unrelated bad news, or permission to ignore it. Put risk controls (cost cap, scope limit, compliance gate) in the body as facts, not as apologies.
+
+**Asking for a PR review**
+
+Reviewers have their own work, so ask once and then wait.
+
+- Post one review request per PR (or per set of paired PRs), naming the reviewers once.
+- When a push dismisses an approval, or after you answered the review comments, re-request the review on GitHub and wait, with no new message: the re-request button on the PR, or `gh api -X POST repos/<owner>/<repo>/pulls/<n>/requested_reviewers -f 'reviewers[]=<login>'`.
+- Post again in the thread only when the PR changed in a way reviewers must know before they look (a new approach, a bug found in prod). Then write "Could you take another look?" with what changed, and no @mention or name.
+- Never chase an approval: no "any update?", no new ask because the merge window is closing. A late approval means the merge waits.
 
 **Answering a hard question or criticism**
 - Never reply with only the conclusion ("Yes. That's covered in the docs.", "That's the default link color."). Give the answer and the reason, in that order.
@@ -132,9 +141,11 @@ Don't mix readers in one message. A question for someone outside the conversatio
 - If you want product to confirm whether the behavior is intended, ask the owner in a DM, not in the support thread (see "One message per reader").
 
 **Closing loosely**
-- Replace "add it to our radar", "something to think about", "just my 2 cents" with a concrete action: a ticket, an owner, a date. "No rush" is fine next to a concrete ask, not instead of one.
+- Replace "add it to our radar", "something to think about", "just my 2 cents" with a concrete action: a ticket or an owner, plus a date only when the user commits to it or the reader decides for the business. "No rush" is fine next to a concrete ask, not instead of one.
 
 **Reviving a cold thread or unanswered DM**
+
+This covers decisions and questions. A PR waiting for review follows "Asking for a PR review" instead and gets no bumps.
 - Wait 3 to 5 business days before the first bump (longer for execs and fractional roles).
 - Bump with new value, not "any update?": a result, a number, a prototype, or a narrower question.
 - Narrow the ask each time: decision, then a 15-minute call, then "who should I ask instead?"
@@ -169,7 +180,8 @@ Flag and fix any of these before handing it back:
 - A follow-up that points back to an earlier message instead of answering, or ends with "Is there something else I can help you with?".
 - Self-undercutting: apologies before the ask, "sorry to bother", "feel free to ignore", "no hard feelings", "or I'll drop it".
 - A vague closer with no action.
-- A date, "today", "tomorrow" or "ASAP" in a request to an engineer or reviewer. Only decision makers outside engineering get a date.
+- A date, a time, "today", "tomorrow", "this morning" or "ASAP" in a request to an engineer or reviewer. Only decision makers outside engineering get a date.
+- A second message asking for the same PR's review or approval, or a follow-up review ask that names or @mentions people. Re-request on GitHub instead (see "Asking for a PR review").
 - A problem with no proposed plan, or an opinion phrased as "maybe we could" instead of a recommendation.
 - A technical trade-off described only in technical terms, or decided without telling the people who own the business call.
 - A technical point with no business or user impact when the reader is product, business or leadership (latency, throughput, error rate or job count stated without what it means for customers, orders, revenue, support or team time).
@@ -186,7 +198,7 @@ If the user's draft is already good, say so and change only what makes it weaker
 
 - When the reply takes a position: the verdict from step 2 first, in two or three lines (which side the evidence supports, the deciding numbers with their source, and the weakest point in the user's position).
 - The reply, ready to paste, in the language of the thread (the user may talk to you in Portuguese about an English thread). Put it inside a fenced code block, never in a `>` blockquote, because the user copies it from the terminal and the blockquote's side bar gets copied with the text. When the reply itself contains a ``` code block, use `~~~` for the outer fence.
-- A "check before sending" list with every assumption you filled in (dates, deadlines, which PR matters more, what the doc covers). No placeholders in the reply itself unless the user can't avoid filling them; if a value is unknown, pick a sensible one and list it here.
+- A "check before sending" list with every assumption you filled in (which PR matters more, what the doc covers, a date the user commits to). No placeholders in the reply itself unless the user can't avoid filling them; if a value is unknown, pick a sensible one and list it here. Never fill in a deadline the user didn't give.
 - For a non-technical reader, "If they ask": two or three one-line follow-up replies, ready to paste, for the questions they're likely to ask next ("who deleted it?", "how did they download it then?"), each with the evidence behind it in a note for the user. This is the detail layer that stays out of the first message.
 - When someone outside the thread needs to confirm something, the DM to them as a separate draft.
 - Optional variants only when the choice is the user's to make (for example whether to offer to own the work).
