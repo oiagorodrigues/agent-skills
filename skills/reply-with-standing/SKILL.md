@@ -181,6 +181,7 @@ Flag and fix any of these before handing it back:
 - Self-undercutting: apologies before the ask, "sorry to bother", "feel free to ignore", "no hard feelings", "or I'll drop it".
 - A vague closer with no action.
 - A date, a time, "today", "tomorrow", "this morning" or "ASAP" in a request to an engineer or reviewer. Only decision makers outside engineering get a date.
+- A commit hash, PR number, ticket key or doc named without its link, or a bare URL in the sentence. Put the link on the label (`plain-writing` has the syntax).
 - A second message asking for the same PR's review or approval, or a follow-up review ask that names or @mentions people. Re-request on GitHub instead (see "Asking for a PR review").
 - A problem with no proposed plan, or an opinion phrased as "maybe we could" instead of a recommendation.
 - A technical trade-off described only in technical terms, or decided without telling the people who own the business call.
@@ -227,7 +228,7 @@ Never send, post or schedule the message yourself unless the user says to. If th
 
 1. Get the conversation id (`slack_search_users` gives the user id, and `slack_read_channel` with it shows the `D...` DM id) and the team id (the `T...` in any Slack bot address or channel link).
 2. Open a new tab at `https://app.slack.com/client/<team id>/<conversation id>`. If Slack shows a sign-in page, stop and ask the user to sign in.
-3. Click the composer (`find` "Message to <name>"), type the text, check it with `get_page_text` or a screenshot before pressing Enter.
+3. Click the composer (`find` "Message to <name>"), type the text, check it with `get_page_text` or a screenshot before pressing Enter. Put each link on its label: at the spot, press `cmd+shift+u`, type the label in the dialog's Text field and the URL in its Link field, and save.
 4. Check that the message shows in the conversation without a footer, close the tab and give the user the message link.
 
 If the browser can't do it (the tools aren't connected, Slack asks to sign in, the page doesn't respond), send it with the Slack MCP and tell the user it went through the connector, with the footer.

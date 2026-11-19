@@ -73,6 +73,8 @@ Write every link as its full raw URL, e.g. `https://github.com/acme/shop/pull/12
 
 This applies to chat responses and summaries: PRs, issues, Jira tickets, artifacts, docs, dashboards. A short label is fine next to the URL ("PR #203: https://github.com/..."). Files written for other renderers (PR descriptions, Jira, Markdown docs) can keep normal Markdown links.
 
+In text other people read (Slack, PR descriptions, PR review comments and replies, Jira, Confluence, docs), every reference is a link on its label, never a bare id and never a bare URL in the sentence: "fixed in commit [`bd09722`](<commit url>)", "this [PR](<pr url>) proposes...", "here is the [proposal](<doc url>)". That covers commits, PRs, tickets, files and lines, Slack threads, docs, dashboards and errors. Use the destination's link syntax; `plain-writing` has it per tool.
+
 ## Slack
 
 Do everything in Slack (send, reply in a thread, react, edit) through Slack web in Chrome with the claude-in-chrome tools first, because the Slack connector's `slack_send_message` appends "Sent using @Claude", which triggers the Claude app in the thread. Use the Slack MCP only when the browser can't do it (the tools aren't connected, Slack asks to sign in, the page doesn't respond), and say in your reply that it went through the connector. `reply-with-standing` has the steps.

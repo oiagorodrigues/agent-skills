@@ -85,7 +85,7 @@ Keep from the author's best messages:
 - Pushback with the cost and an alternative: "This would block the user until it's closed. We can keep the same behavior as the other flow and show an Alert with the validation error below the field."
 - Status as done, proof, what's next: "Both are done and deployed. I tested them on staging and everything works as expected. I'll watch the alerts for related issues."
 - Answers to customer support and product lead with the answer (confirmed or not, the cause) and add the plan only when there is one, in one message.
-- In Slack and Jira message text, links go on a short label ("this ticket", the ticket title), never a bare URL in the sentence. Chat replies to the user keep raw URLs.
+- In text other people read (Slack, PR descriptions, review comments and replies, Jira, Confluence, docs), every reference is a link on a short label: "fixed in commit [`bd09722`](<commit url>)", "this [PR](<pr url>) proposes...", "here is the [proposal](<doc url>)". Never a bare commit hash, PR number or ticket key the reader has to look up, and never a bare URL in the sentence. Commits link to `https://github.com/<org>/<repo>/commit/<full-sha>`. Syntax per destination: Markdown `[label](<url>)` on GitHub, Confluence and Markdown docs; in Jira through the MCP, Markdown or the editor's link; in Slack web, the add-link dialog (see `reply-with-standing`). Chat replies to the user keep raw URLs.
 
 Hard rules, everywhere:
 
