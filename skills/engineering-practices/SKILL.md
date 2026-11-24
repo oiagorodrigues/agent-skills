@@ -40,7 +40,7 @@ When a rule names a file under `references/`, read that file for the reasoning a
 - For work across several layers, build one thin path that runs end to end (UI, API, service, storage) before filling in any layer, a tracer bullet (`references/delivery-rules.md`).
 - Verify before claiming done. Passing tests are not proof that a user-visible change works: exercise it in the running system, and prove a write by comparing the stored record before and after. Probe the variants, not only the happy path: empty input, each role, logged out, every flag value. Save the proof of each check (a screenshot written to disk, the command and its output, the query and its result) and list where it is in the report, as `references/reducing-ai-slop.md` asks of the verifier. A check whose proof was only looked at, not saved, doesn't count. Run `references/done-checks.md` as the last pass.
 - When you hand a change to the user to test by hand, send the whole plan in one message, written as the real user's flow in product words. Per scenario give the sign-in or impersonation link, the exact records with ids and URLs, the starting data (and how to create it when it doesn't exist), each step and its expected result. Run the flow yourself in the browser first, so no step depends on a screen you haven't seen.
-- Run checks scoped to what changed, with commands that exit. On the user's own PR work, run lint and the type check locally, push, and let CI run the test suites, then check the CI result before calling it done. Run a single targeted test locally only to debug a failure. Don't leave watch processes running, don't run repo-wide fixers on files you didn't edit, and report every check you skipped and why.
+- Run checks scoped to what changed, with commands that exit. On the user's own PR work, run lint and the type check locally, push, and let CI run the test suites, then check the CI result before calling it done. Run a single targeted test locally only to debug a failure. Don't leave watch processes running, don't run repo-wide fixers on files you didn't edit, and report every check you skipped and why. Size the checks to the change: a move or rename needs the type check, lint, unit tests, the build and a grep for the old paths, and integration, e2e or a running app only when runtime behavior changes or the user asks. Never download or install tooling the repo's setup doesn't already provide (browsers, CLIs, global packages) without asking first.
 - If a check still fails after about three fix attempts, each on a changed hypothesis, stop and report the command and its error. Never undo your own work or silence a tool just to make a check pass; a failing test follows "Never fix a failing test" under Testing.
 - Before declaring done, re-read your own diff for edge cases, contradictions with the surrounding code, drift from the request, and every caller of what you changed. Stop after two or three passes and summarize.
 - Report what you changed, the decisions you made, every deliberate deviation with its reason, and what you could not verify.
@@ -179,6 +179,14 @@ When a rule names a file under `references/`, read that file for the reasoning a
 - Publish events with the outbox pattern: write the event in the same transaction as the state change and deliver it from a separate relay, so no event is lost or sent without its change.
 - Consumers deduplicate and process in order (inbox pattern), tolerate duplicates and out-of-order delivery, and tolerate added or removed fields.
 - Jobs, handlers, backfills and seed scripts are idempotent: safe to retry or rerun from the start.
+- For a change to a client write path (a save, submit or sync, an optimistic-concurrency check, a merge or retry of server data), the PR description or plan says what happens in each of these outcomes, and tests cover the ones that can lose or duplicate data:
+  - the write commits but the client never gets the response (timeout, dropped connection, closed tab);
+  - a later step of a multi-step save fails after an earlier step committed;
+  - the user retries or submits twice;
+  - the same user has the record open in two places;
+  - the client's starting copy came from a stale read (replica, cache).
+
+  When the server is ahead of the client's copy, the client first rules out its own unanswered write before it treats the change as another user's. Write these tests against a fake server that keeps state, that the client's own writes change, and that can drop a response.
 - Retry only transient or explicitly retryable errors, with a cap and backoff, and send poison messages to a dead-letter queue. Apply backpressure and monitor queue depth and failure rates.
 - Fail fast in multi-stage pipelines: a failed stage fails the run, with no hidden retries inside it.
 - Model the trigger and the outcome as separate records: a request or a lock is not proof of what happened.
@@ -230,6 +238,7 @@ These are the rules for writing code. To review a diff, PR or feature for securi
 - Every new failure point gets a log line, an error-tracking capture or a metric. Make silent failures visible.
 - Logs are structured, with context fields (ids, action, error) and a trace id, never bare strings.
 - An error-level log says what happened, to what and why, with what's needed to reproduce, and is used only for real errors because it pages someone. Warnings for unusual-but-not-urgent; debug and info sparingly.
+- A change that adds or changes a log field or metric that a count, alert, dashboard or rollout check reads is done only when you have seen what the real formatter or exporter emits. A test runs the record through the formatter the deployed handler uses, or the metric through its exporter, and asserts the output, never only the attribute passed to the logger, because a formatter can rename, drop or reject a field the logger call accepted. Before the change reaches production, read one real line in the first environment that uses that formatter.
 - Telemetry tags (environment, service, version) match the application's own values.
 - Define latency and availability objectives from real baselines and tighten them over time.
 - Back claims about production with the `prod-evidence` skill, which sets what the proof includes. Name the gaps in detection out loud.

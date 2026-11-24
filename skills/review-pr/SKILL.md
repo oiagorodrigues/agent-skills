@@ -189,6 +189,10 @@ When the diff touches backend code (Django, Node services, SQL, migrations, jobs
 
 When the diff adds or changes a status or state field, a flag that gates behavior, or a write to one, run "Check one machine" from the `hunting-bugs` skill on that machine only.
 
+When the diff changes a client write path (a save, submit or sync, an optimistic-concurrency check, a merge or retry of server data): go through the five write outcomes in the `engineering-practices` rule under "Transactions, events and distributed systems". For each, state what the code does and the test that shows it. An outcome that can duplicate or lose data with no test goes in Act on.
+
+When the diff adds or changes a log field or metric that a count, alert, dashboard or rollout check reads: find the test that asserts the formatted output through the real formatter or exporter, and the plan to read one real line before production. A missing test goes in Act on.
+
 ## Specialist checks
 
 Each specialist skill carries rules the lanes above only skim. The lead decides which ones run from the diff and the impact report, with the table below; the rules live in each skill, so a specialist lane follows its skill and this file doesn't repeat them. Each one that runs is its own subagent lane, on Reviewer A's model at medium effort, with the diff, the intent list, the repo rules, the worktree path and the trigger that started it. Read `references/specialist-checks.md` for that brief and for which part of each skill the lane runs. Specialist findings go through Synthesis like any reviewer's.
