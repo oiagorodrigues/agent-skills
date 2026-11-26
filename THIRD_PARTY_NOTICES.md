@@ -49,3 +49,7 @@ SOFTWARE.
 ```
 
 When a skill adapts a new source, add its row here in the same change.
+
+## Visual learning
+
+Educational design references: [Anatomy](https://github.com/wheresryan22/anatomy), wheresryan22 (MIT), and [How I Turn Any Question Into a Machine You Can Run](https://x.com/elvar_official/status/2111831136171151589), Elvar. The skill is original instruction text. No upstream software or article assets are bundled.
