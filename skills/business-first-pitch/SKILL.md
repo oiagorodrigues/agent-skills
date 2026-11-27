@@ -25,12 +25,24 @@ Identify: (1) audience and decision maker, (2) customer/business problem, (3) pr
 
 0. **Right thing:** Before selling an improvement, feature or architecture, check that it is the right thing to deliver: it moves a business outcome the company needs now, more than the other work it would displace. If it doesn't, tell the user and suggest what would, instead of polishing the pitch.
 1. **Problem:** State what is failing or being missed and who is affected. Avoid opening with architecture or technology.
-2. **Business impact:** Translate technical metrics into possible customer, operational, or financial outcomes; distinguish measured effects from hypotheses.
+2. **Business impact:** Translate technical metrics into possible customer, operational, or financial outcomes; distinguish measured effects from hypotheses. Check the case against the five business questions below.
 3. **Economics:** Read [ROI guide](references/roi-guide.md) for financial claims. Classify hard cash flows, risk-adjusted expected loss, useful capacity, and nonmonetary benefits. Separate costs and rollout disruption.
 4. **Trade-off:** Contrast status quo vs. limited pilot vs. full rollout. Expose opportunity cost and a credible counterargument. When the options differ on technical grounds (build vs. buy, quick fix vs. redesign, consistency vs. speed), restate each one as what the business gets and risks, so stakeholders can make a better decision instead of deferring to engineering or guessing.
 5. **Ask:** Finish with one specific decision, owner, and next step. Prefer a low-risk experiment if evidence is weak.
 6. **Pre-wire:** Suggest one person to align with before a broad meeting and a discovery question to learn their priorities.
 7. **Delivery:** Make the script sound like a human; use short sentences, active verbs, and minimal jargon.
+
+## The five business questions
+
+Every business case answers these, whether it sells cloud adoption, an AI agent, a platform change or a partnership:
+
+1. **Revenue growth:** how it helps the business grow: new customers, markets or products, faster launches, more volume without new hires.
+2. **Cost structure:** total cost of ownership and ROI, with every cost the change adds or removes (see `references/roi-guide.md`).
+3. **Competitive advantage:** what it lets the company do that competitors can't, or do sooner or cheaper. Name the competitor or the alternative the customer has.
+4. **Business risk:** the risks of doing it next to the risks of not doing it (falling behind, end-of-life systems, security and compliance exposure, key-person dependence). Not doing it is never free.
+5. **Customer experience:** what changes for the customer and the brand: speed, reliability, new capabilities, trust.
+
+Answer each with evidence, or mark it unknown with the measurement that would answer it; never fill one with a guess. When one doesn't apply, say so in a line. The short default pitch leads with the strongest one or two; `written`, `meeting` and `roi` answer all five.
 
 ## Default answer format
 
