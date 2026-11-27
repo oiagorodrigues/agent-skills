@@ -225,8 +225,7 @@ for write or admin permissions.
       "Effect": "Allow",
       "Action": ["iam:GetRole"],
       "Resource": "arn:aws:iam::<ACCOUNT_ID>:role/<PLANNED_ROLE_NAME>"
-    },
-    { "Sid": "Identity", "Effect": "Allow", "Action": ["sts:GetCallerIdentity"], "Resource": "*" }
+    }
   ]
 }
 ```

@@ -75,9 +75,15 @@ Run AWS calls with the AWS CLI from the shell, under the Safety rules and Tools 
   ```
 
 - `aws:TagKeys` values are case-sensitive, but the tag key in `aws:PrincipalTag/<key>`, `aws:ResourceTag/<key>`, and `aws:RequestTag/<key>` is not. The Allow allowlist above is unaffected (a re-cased key is simply not in the list), but a Deny that protects a tag key with `ForAnyValue:StringEquals` on `aws:TagKeys` is bypassed by a re-cased key (`PROTECTED-TAG`) — use `ForAnyValue:StringEqualsIgnoreCase`. See [references/common-pitfalls.md](references/common-pitfalls.md).
-- Resource-based policies granting to IAM user ARN bypass permissions boundaries in same account.
+- In the same account, a resource-based policy that names an IAM user ARN or a role session ARN grants past the boundary's implicit deny; one that names the role ARN doesn't. An explicit Deny in the boundary still blocks ([policy evaluation logic](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html)).
 - 8 privilege escalation actions via direct IAM policy manipulation: PutGroupPolicy, PutRolePolicy, PutUserPolicy, CreatePolicy, CreatePolicyVersion, AttachGroupPolicy, AttachRolePolicy, AttachUserPolicy.
 - `iam:PassRole` with `Resource: "*"` + create/update on a compute service (EC2 `RunInstances`, Lambda `CreateFunction`/`UpdateFunctionConfiguration`, ECS `RegisterTaskDefinition`, Glue, SageMaker, CloudFormation, etc.) = privilege escalation to any passable role in the account, including Administrator. Scope `Resource` to specific role ARNs or an IAM path; optionally constrain with `iam:PassedToService` / `iam:AssociatedResourceArn`. See [IAM User Guide — Grant a user permissions to pass a role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html).
+
+**Writing identity policies** (from Alex Smolen, https://engseclabs.com/blog/things-llms-get-wrong-about-aws-iam/):
+
+- Leave `sts:GetCallerIdentity` and `sts:GetSessionToken` out of policies. Neither needs a permission, and a Deny doesn't stop `GetCallerIdentity` ([API reference](https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html)). An Allow for either in a policy under review means the author guessed; read the rest of it more closely.
+- Grant with Allow statements scoped to actions and resources. A Deny in an identity policy (often `NotAction` with `Resource: "*"`) usually guards nothing the missing Allow didn't already block, and it makes the policy harder to read. Put "no identity may do X" rules, such as never disabling audit logging, in an SCP or RCP.
+- Use a permissions boundary only when a principal other than the IAM owners can create or change roles or users: another team, a CI/CD pipeline, a CDK or CloudFormation deploy role ([AWS Security Blog](https://aws.amazon.com/blogs/security/when-and-where-to-use-iam-permissions-boundaries/)). Put it on the roles that principal creates, require it with an `iam:PermissionsBoundary` condition on the create and put actions, deny deleting the boundary and editing the boundary policy, and scope `iam:PassRole` and the role path. A boundary grants nothing and can't go on a service-linked role. For any other restriction, narrow the identity policy, or use an SCP (principals) or RCP (resources) when the limit must hold for a whole account or organization.
 
 **MFA:**
 
